@@ -1,0 +1,122 @@
+require_relative 'db_connection'
+require 'active_support/inflector'
+
+class SQLObject
+  extend Searchable
+  extend Associatable
+
+  def self.columns
+    return @columns if @columns
+
+    #returns a nested array, the first element of which is an array of column names
+    table_info = DBConnection.execute2(<<-SQL)
+    SELECT *
+    FROM #{self.table_name}
+    SQL
+
+    #returns a list of column names as symbols
+    @columns = table_info.first.map(&:to_sym)
+  end
+
+  def self.finalize!
+    cols = self.columns
+
+    cols.each do |col|
+      #define getter
+      define_method(col) do
+        self.attributes[col]
+      end
+
+      #define setter
+      #attributes will return a hash of column names and values
+      define_method("#{col}=") do |val|
+        self.attributes[col] = val
+      end
+    end
+    #finalize will be called at end of sublcass definitions do define getters and setters
+  end
+
+  #sets table name
+  #use to overwrite built in pluralize method (e.g. human => humen)
+  def self.table_name=(table_name)
+    @name = table_name
+  end
+
+  #gets table name or converts it to snake case
+  def self.table_name
+    @name || self.name.underscore.pluralize
+  end
+
+  def self.all
+    hashes = DBConnection.execute(<<-SQL)
+    SELECT *
+    FROM #{self.table_name}
+    SQL
+
+    self.parse_all(hashes)
+  end
+
+  def self.parse_all(results)
+    #creates a new object from each hash
+    results.map { |hash| self.new(hash) }
+  end
+
+  def self.find(id)
+    hash = DBConnection.execute(<<-SQL, id)
+    SELECT *
+    FROM #{self.table_name}
+    WHERE id = ?
+    SQL
+
+    self.parse_all(hash).first
+  end
+
+  def initialize(params = {})
+    params.each do |attr_name, value|
+      attr_name = attr_name.to_sym
+
+      unless self.class.columns.include?(attr_name)
+        raise "unknown attribute '#{attr_name}'"
+      end
+
+      self.send("#{attr_name}=", value)
+    end
+  end
+
+  def attributes
+    @attributes ||= {}
+  end
+
+  def attribute_values
+    self.class.columns.map { |col| self.attributes[col] }
+  end
+
+  def insert
+    #return all columns except id
+    col_names = self.class.columns[1..-1].join(", ")
+
+    #create correct number of question marks
+    question_marks = col_names.split(", ").map { |c| "?" }.join(", ")
+
+    DBConnection.execute(<<-SQL, *attribute_values[1..-1])
+    INSERT INTO #{self.class.table_name} (#{col_names})
+    VALUES (#{question_marks})
+    SQL
+
+    self.id = DBConnection.last_insert_row_id
+  end
+
+  def update
+    set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
+
+    DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
+    UPDATE #{self.class.table_name}
+    SET #{set_line}
+    WHERE id = ?
+    SQL
+  end
+
+  def save
+    self.id ? self.update : self.insert
+  end
+end
