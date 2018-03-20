@@ -1,4 +1,6 @@
 require_relative 'db_connection'
+require_relative 'searchable'
+require_relative 'associatable'
 require 'active_support/inflector'
 
 class SQLObject
@@ -75,11 +77,11 @@ class SQLObject
     params.each do |attr_name, value|
       attr_name = attr_name.to_sym
 
-      unless self.class.columns.include?(attr_name)
+      if self.class.columns.include?(attr_name)
+        self.send("#{attr_name}=", value)
+      else
         raise "unknown attribute '#{attr_name}'"
       end
-
-      self.send("#{attr_name}=", value)
     end
   end
 

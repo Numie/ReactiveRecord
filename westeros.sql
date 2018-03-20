@@ -12,16 +12,16 @@ CREATE TABLE houses (
   name VARCHAR(255) NOT NULL,
   region_id INTEGER,
 
-  FOREIGN KEY(region_id) REFERENCES house(id)
+  FOREIGN KEY(region_id) REFERENCES region(id)
 );
 
-CREATE TABLE region (
+CREATE TABLE regions (
   id INTEGER PRIMARY KEY,
   name VARCHAR(255) NOT NULL
 );
 
 INSERT INTO
-  region (id, name)
+  regions (id, name)
 VALUES
   (1, "The North"), (2, "The South");
 
