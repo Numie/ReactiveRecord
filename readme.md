@@ -4,7 +4,7 @@
 
 1. Navigate into the Ruby_O_R_Gem directory in the terminal.
 1. Run 'cat westeros.sql | sqlite3 westeros.db'.
-1. Stars pry and load 'lib/rubyorgem.rb'.
+1. Start pry and load 'lib/rubyorgem.rb'.
 
 ## Classes and Their Ruby ORGem Associations
 
@@ -57,7 +57,6 @@ eddard.regiom
 Run:
 'stark = House.find(1)'
 'stark.people'
-
 
 ### House#region
 Run:

@@ -77,7 +77,7 @@ class SQLObject
     hash = DBConnection.execute(<<-SQL, n)
     SELECT *
     FROM #{self.table_name}
-    LIMIT n
+    LIMIT ?
     SQL
 
     self.parse_all(hash)
@@ -88,7 +88,7 @@ class SQLObject
   end
 
   def self.last
-    last_id = DBConnection.last_insert_row_id
+    last_id = self.all.length
     self.find(last_id)
   end
 
