@@ -73,6 +73,25 @@ class SQLObject
     self.parse_all(hash).first
   end
 
+  def self.take(n=1)
+    hash = DBConnection.execute(<<-SQL, n)
+    SELECT *
+    FROM #{self.table_name}
+    LIMIT n
+    SQL
+
+    self.parse_all(hash)
+  end
+
+  def self.first
+    self.find(1)
+  end
+
+  def self.last
+    last_id = DBConnection.last_insert_row_id
+    self.find(last_id)
+  end
+
   def initialize(params = {})
     params.each do |attr_name, value|
       attr_name = attr_name.to_sym
