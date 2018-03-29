@@ -3,8 +3,14 @@
 ## Setup Instructions
 
 1. Navigate into the Ruby_O_R_Gem directory in the terminal.
-1. Run 'cat westeros.sql | sqlite3 westeros.db'.
-1. Start pry and load 'lib/rubyorgem.rb'.
+2. Run:
+ ```
+ cat westeros.sql | sqlite3 westeros.db
+ ```
+3. Start pry and run:
+```
+load 'lib/rubyorgem.rb'
+```
 
 ## Classes and Their Ruby ORGem Associations
 
