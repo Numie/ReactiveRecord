@@ -19,24 +19,37 @@ A Region has many Houses.
 ## General Methods
 
 ### ::all
-Run 'House.all' to see a list of the houses of Westeros.
+See a list of the houses of Westeros.
+```
+House.all
+```
 
 ### ::find(id)
-Run 'Region.find(1)' to identify 'The North'.
+Identify 'The North'.
+```
+Region.find(1)
+```
 
 ### ::where(params)
-Run "Person.where(last_name: 'Stark')" to find the members of House Stark.
+Find the members of House Stark.
+```
+Person.where(last_name: 'Stark')
+```
 
 ### #insert
-Run:
-'tommen = Person.new(first_name: 'Tommen', last_name: 'Baratheon', house_id: 2)'
-'tommen.insert'
+Insert Tommen Baratheon.
+```
+tommen = Person.new(first_name: 'Tommen', last_name: 'Baratheon', house_id: 2)
+tommen.insert
+```
 
 ### #update
-Run:
-'theon = Person.find(27)'
-'theon.house_id = 1'
-'theon.update'
+Update Theon Greyjoy.
+```
+theon = Person.find(27)
+theon.house_id = 1
+theon.update
+```
 
 ### #save
 Use 'save' in lieu of either 'insert' or 'update'.
@@ -44,26 +57,36 @@ Use 'save' in lieu of either 'insert' or 'update'.
 ## Association Methods
 
 ### Person#house
-Run:
-'jon = Person.find(10)'
-'jon.house'
+Find Jon Snow's house.
+```
+jon = Person.find(10)
+jon.house
+```
 
 ### Person#region
-Run:
-'eddard = Person.find(1)'
-eddard.regiom
+Find Eddard Stark's region.
+```
+eddard = Person.find(1)
+eddard.region
+```
 
 ### House#people
-Run:
-'stark = House.find(1)'
-'stark.people'
+Find all people in House Stark.
+```
+stark = House.find(1)
+stark.people
+```
 
 ### House#region
-Run:
-'stark = House.find(1)'
-'stark.region'
+Find the region of House Stark.
+```
+stark = House.find(1)
+stark.region
+```
 
 ### Region#houses
-Run:
-'south = Region.find(2)'
-'south.houses'
+Find all the houses in the South.
+```
+south = Region.find(2)
+south.houses
+```
