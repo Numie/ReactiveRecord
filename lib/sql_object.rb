@@ -63,14 +63,19 @@ class SQLObject
     results.map { |hash| self.new(hash) }
   end
 
-  def self.find(id)
-    hash = DBConnection.execute(<<-SQL, id)
-    SELECT *
-    FROM #{self.table_name}
-    WHERE id = ?
-    SQL
+  def self.find(ids)
+    ids = [ids] if ids.is_a?(Integer)
+    result = []
+    ids.each do |id|
+      hash = DBConnection.execute(<<-SQL, id)
+      SELECT *
+      FROM #{self.table_name}
+      WHERE id = ?
+      SQL
+      result.concat(hash)
+    end
 
-    self.parse_all(hash).first
+    result.length == 1 ? self.parse_all(result).first : self.parse_all(result)
   end
 
   def self.take(n=1)
@@ -90,6 +95,15 @@ class SQLObject
   def self.last
     last_id = self.all.length
     self.find(last_id)
+  end
+
+  def self.pluck(col)
+    hash = DBConnection.execute(<<-SQL, col)
+    SELECT #{col}
+    FROM #{self.table_name}
+    SQL
+
+    self.parse_all(hash)
   end
 
   def initialize(params = {})

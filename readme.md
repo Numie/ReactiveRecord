@@ -30,10 +30,32 @@ See a list of the houses of Westeros.
 House.all
 ```
 
-### ::find(id)
+### ::find(ids)
 Identify 'The North'.
 ```
 Region.find(1)
+```
+Can also take an array of IDs:
+```
+Region.find([1, 2])
+```
+
+### ::take(n)
+Return Eddard, Catelyn and Robb Stark.
+```
+Person.take(3)
+```
+
+### ::first
+Find the first house in the database, House Stark.
+```
+House.first
+```
+
+### ::last
+Find the last house in the database, House Targaryen.
+```
+House.last
 ```
 
 ### ::where(params)
