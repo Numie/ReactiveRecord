@@ -2,12 +2,14 @@
 
 ## Setup Instructions
 
-1. Navigate into the Ruby_O_R_Gem directory in the terminal.
-2. Run:
+1. Clone the repo.
+2. Navigate into the Ruby_O_R_Gem directory in the terminal.
+3. Run:
+```
+bundle install
+cat westeros.sql | sqlite3 westeros.db
  ```
- cat westeros.sql | sqlite3 westeros.db
- ```
-3. Start pry and run:
+5. Start pry and load the entry file:
 ```
 load 'lib/rubyorgem.rb'
 ```
@@ -56,6 +58,16 @@ House.first
 Find the last house in the database, House Targaryen.
 ```
 House.last
+```
+
+### ::select(column_names)
+Find the ID and name of each House.
+```
+House.select(:id, :name)
+```
+Also accepts a string:
+```
+House.select('id, name')
 ```
 
 ### ::where(params)
