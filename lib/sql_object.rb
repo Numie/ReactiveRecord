@@ -97,6 +97,16 @@ class SQLObject
     self.find(last_id)
   end
 
+  def self.find_by(params)
+    self.where(params).take(1)
+  end
+
+  def self.find_by!(params)
+    result_array = self.where(params)
+    raise 'RubyORGem::RecordNotFound' if result_array.empty?
+    result_array.take(1)
+  end
+
   def self.pluck(col)
     hash = DBConnection.execute(<<-SQL, col)
     SELECT #{col}

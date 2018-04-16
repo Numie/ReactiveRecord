@@ -9,7 +9,7 @@
 bundle install
 cat westeros.sql | sqlite3 westeros.db
  ```
-5. Start pry and load the entry file:
+4. Start pry and load the entry file:
 ```
 load 'lib/rubyorgem.rb'
 ```
