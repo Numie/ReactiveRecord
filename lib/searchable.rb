@@ -43,4 +43,21 @@ module Searchable
     #create array of objects from each hash
     hashes.map { |hash| self.new(hash) }
   end
+
+  def order(col)
+    if col.is_a?(String)
+      val = col
+    else
+      val = col.to_s
+    end
+
+    hashes = DBConnection.execute(<<-SQL)
+    SELECT *
+    FROM #{self.table_name}
+    ORDER BY #{val}
+    SQL
+
+    #create array of objects from each hash
+    hashes.map { |hash| self.new(hash) }
+  end
 end
