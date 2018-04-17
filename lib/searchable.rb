@@ -67,4 +67,15 @@ module Searchable
     #create array of objects from each hash
     hashes.map { |hash| self.new(hash) }
   end
+
+  def limit(n)
+    hashes = DBConnection.execute(<<-SQL)
+    SELECT *
+    FROM #{self.table_name}
+    LIMIT #{n}
+    SQL
+
+    #create array of objects from each hash
+    hashes.map { |hash| self.new(hash) }
+  end
 end

@@ -104,7 +104,7 @@ Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 ```
 
 ### ::order(column_name)
-Order the houses by name or multiple columns ascending or descending:
+Order the houses by name or by multiple columns:
 ```
 House.order(:name)
 House.order(name: :desc)
@@ -115,6 +115,12 @@ Also accepts a string:
 House.order('name')
 House.order('name DESC')
 House.order('region_id, name DESC')
+```
+
+### ::limit(n)
+Return the first 3 people:
+```
+Person.limit(3)
 ```
 
 ### #insert
