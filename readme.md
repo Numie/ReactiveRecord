@@ -103,6 +103,20 @@ Person.where("last_name = 'Stark' AND first_name = 'Arya'")
 Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 ```
 
+### ::order(column_name)
+Order the houses by name or multiple columns ascending or descending:
+```
+House.order(:name)
+House.order(name: :desc)
+House.order(:region_id, name: :desc)
+```
+Also accepts a string:
+```
+House.order('name')
+House.order('name DESC')
+House.order('region_id, name DESC')
+```
+
 ### #insert
 Insert Lancel Lannister.
 ```
