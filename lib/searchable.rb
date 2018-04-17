@@ -44,17 +44,24 @@ module Searchable
     hashes.map { |hash| self.new(hash) }
   end
 
-  def order(col)
-    if col.is_a?(String)
-      val = col
+  def order(*cols)
+    if cols.is_a?(String)
+      order_by_line = cols
     else
-      val = col.to_s
+      string_cols = cols.map do |col|
+        if col.is_a?(Hash)
+          col.flatten(&:to_s).join(" ")
+        else
+          col.to_s
+        end
+      end
+      order_by_line = string_cols.join(", ")
     end
 
     hashes = DBConnection.execute(<<-SQL)
     SELECT *
     FROM #{self.table_name}
-    ORDER BY #{val}
+    ORDER BY #{order_by_line}
     SQL
 
     #create array of objects from each hash
