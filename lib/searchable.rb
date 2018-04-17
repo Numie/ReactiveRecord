@@ -21,8 +21,13 @@ module Searchable
 
   def where(params)
     #create the string of where conditions
-    where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
-    vals = params.values
+    if params.is_a?(String)
+      where_line = params
+      vals = nil
+    elsif params.is_a?(Hash)
+      where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
+      vals = params.values
+    end
 
     hashes = DBConnection.execute(<<-SQL, vals)
     SELECT *

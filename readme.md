@@ -75,12 +75,21 @@ Find the members of House Stark.
 ```
 Person.where(last_name: 'Stark')
 ```
+Also accepts a string with standard SQL syntax:
+```
+Person.where("last_name = 'Stark'")
+```
+And multiple conditions:
+```
+Person.where(last_name: 'Stark', first_name: 'Arya')
+Person.where("last_name = 'Stark' AND first_name = 'Arya'")
+```
 
 ### #insert
-Insert Tommen Baratheon.
+Insert Lancel Lannister.
 ```
-tommen = Person.new(first_name: 'Tommen', last_name: 'Baratheon', house_id: 2)
-tommen.insert
+lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 2)
+lancel.insert
 ```
 
 ### #update
@@ -99,7 +108,7 @@ Use 'save' in lieu of either 'insert' or 'update'.
 ### Person#house
 Find Jon Snow's house.
 ```
-jon = Person.find(10)
+jon = Person.find(8)
 jon.house
 ```
 
