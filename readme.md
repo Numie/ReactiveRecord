@@ -42,6 +42,19 @@ Can also take an array of IDs:
 Region.find([1, 2])
 ```
 
+### ::find_by(params)
+Returns the first result that matches the query.
+```
+Region.find_by(name: 'The North')
+```
+
+### ::find_by!(params)
+Same as ::find_by but returns an error when no results are found:
+```
+Region.find_by!(name: 'The West')
+>> RubyORGem::RecordNotFound
+```
+
 ### ::take(n)
 Return Eddard, Catelyn and Robb Stark.
 ```
@@ -79,10 +92,15 @@ Also accepts a string with standard SQL syntax:
 ```
 Person.where("last_name = 'Stark'")
 ```
+Or syntax to protect against SQL injection attacks:
+```
+Person.where('last_name = ?', 'Stark')
+```
 And multiple conditions:
 ```
 Person.where(last_name: 'Stark', first_name: 'Arya')
 Person.where("last_name = 'Stark' AND first_name = 'Arya'")
+Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 ```
 
 ### #insert

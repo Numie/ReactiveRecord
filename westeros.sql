@@ -27,7 +27,7 @@ VALUES
   (1, "The North"), (2, "The South");
 
 INSERT INTO
-  houses (id, name, region_id)
+  houses (id, name, sigil, region_id)
 VALUES
   (1, "Stark", "Direwolf", 1),
   (2, "Lannister", "Lion", 2),

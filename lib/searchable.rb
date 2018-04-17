@@ -19,14 +19,19 @@ module Searchable
     hashes.map { |hash| self.new(hash) }
   end
 
-  def where(params)
+  def where(params, *args)
     #create the string of where conditions
-    if params.is_a?(String)
-      where_line = params
-      vals = nil
-    elsif params.is_a?(Hash)
+    if params.is_a?(Hash)
       where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
       vals = params.values
+    elsif args
+      where_line = params
+      vals = args
+    elsif params.is_a?(String)
+      where_line = params
+      vals = nil
+    else
+      raise 'RubyORGem Error'
     end
 
     hashes = DBConnection.execute(<<-SQL, vals)
