@@ -1,5 +1,6 @@
 require_relative 'db_connection'
 require_relative 'sql_object'
+require_relative 'relation'
 
 module Searchable
   def select(*cols)
@@ -17,6 +18,19 @@ module Searchable
 
     #create array of objects from each hash
     hashes.map { |hash| self.new(hash) }
+  end
+
+  def lazy_select(*cols)
+    #create the string of select fields
+    if cols.is_a?(String)
+      vals = cols
+    else
+      vals = cols.map(&:to_s).join(", ")
+    end
+
+    relation = Relation.new
+    relation.model_name, relation.from, relation.select = self.name.constantize, self.table_name, vals
+    relation
   end
 
   def where(params, *args)
