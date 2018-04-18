@@ -58,6 +58,26 @@ module Searchable
     hashes.map { |hash| self.new(hash) }
   end
 
+  def lazy_where(params, *args)
+    #create the string of where conditions
+    if params.is_a?(Hash)
+      where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
+      vals = params.values
+    elsif args
+      where_line = params
+      vals = args
+    elsif params.is_a?(String)
+      where_line = params
+      vals = nil
+    else
+      raise 'RubyORGem Error'
+    end
+
+    relation = Relation.new
+    relation.model_name, relation.from, relation.where, relation.where_vals = self.name.constantize, self.table_name, where_line, vals
+    relation
+  end
+
   def order(*cols)
     if cols.is_a?(String)
       order_by_line = cols

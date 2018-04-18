@@ -1,5 +1,5 @@
 class Relation
-  attr_accessor :model_name, :select, :from, :joins, :where, :group, :having, :order, :limit, :offset, :query_string
+  attr_accessor :model_name, :select, :from, :joins, :where, :where_vals, :group, :having, :order, :limit, :offset, :query_string
 
   def initialize
   end
@@ -8,9 +8,11 @@ class Relation
     query_string = "
       SELECT #{@select || '*'}
       FROM #{@from}
+      #{@where ? "WHERE #{@where}" : nil}
     "
 
-    hashes = DBConnection.execute(<<-SQL)
+    where_vals = self.where_vals
+    hashes = DBConnection.execute(<<-SQL, where_vals)
     #{query_string}
     SQL
 
@@ -19,7 +21,7 @@ class Relation
   end
 
   def where(params)
-    #{@where ? "WHERE #{@where}" : nil}
+
   end
 
 
