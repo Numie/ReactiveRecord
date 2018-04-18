@@ -29,7 +29,7 @@ module Searchable
     end
 
     relation = Relation.new
-    relation.model_name, relation.from, relation.select = self.name.constantize, self.table_name, vals
+    relation.model_name, relation.from_line, relation.select_line = self.name.constantize, self.table_name, vals
     relation
   end
 
@@ -43,7 +43,7 @@ module Searchable
       vals = args
     elsif params.is_a?(String)
       where_line = params
-      vals = nil
+      vals = []
     else
       raise 'RubyORGem Error'
     end
@@ -68,13 +68,13 @@ module Searchable
       vals = args
     elsif params.is_a?(String)
       where_line = params
-      vals = nil
+      vals = []
     else
       raise 'RubyORGem Error'
     end
 
     relation = Relation.new
-    relation.model_name, relation.from, relation.where, relation.where_vals = self.name.constantize, self.table_name, where_line, vals
+    relation.model_name, relation.from_line, relation.where_line, relation.where_vals = self.name.constantize, self.table_name, where_line, vals
     relation
   end
 
