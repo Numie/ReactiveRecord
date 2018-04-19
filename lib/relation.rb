@@ -1,5 +1,6 @@
 class Relation
-  attr_accessor :model_name, :select_line, :from_line, :joins_line, :where_line, :where_vals, :group_line, :having_line, :order_line, :limit_line, :offset_line, :query_string
+  attr_accessor :model_name, :select_line, :from_line, :joins_line, :where_line, :where_vals, :group_line,
+  :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
 
   def initialize
   end
@@ -10,10 +11,21 @@ class Relation
       FROM #{@from_line}
       #{@where_line ? "WHERE #{@where_line}" : nil}
       #{@group_line ? "GROUP BY #{@group_line}" : nil}
+      #{@having_line ? "HAVING #{@having_line}" : nil}
     "
 
     where_vals = self.where_vals
-    hashes = DBConnection.execute(<<-SQL, where_vals)
+    having_vals = self.having_vals
+
+    if having_vals.nil?
+      vals = where_vals
+    elsif where_vals.nil?
+      vals = having_vals
+    else
+      vals = where_vals + having_vals
+    end
+
+    hashes = DBConnection.execute(<<-SQL, vals)
     #{query_string}
     SQL
 
@@ -56,6 +68,26 @@ class Relation
     end
 
     self.group_line = group_line
+    self
+  end
+
+  def having(params, *args)
+    #create the string of having conditions
+    if params.is_a?(Hash)
+      having_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
+      vals = params.values
+    elsif args
+      having_line = params
+      vals = args
+    elsif params.is_a?(String)
+      having_line = params
+      vals = []
+    else
+      raise 'RubyORGem Error'
+    end
+
+    self.having_line ? self.having_line += (" AND " + having_line) : self.having_line = having_line
+    self.having_vals ? self.having_vals += vals : self.having_vals = vals
     self
   end
 end
