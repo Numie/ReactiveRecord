@@ -3,6 +3,13 @@ require_relative 'sql_object'
 require_relative 'relation'
 
 module Searchable
+  def find_by_sql(query)
+    relation = Relation.new
+    relation.model_name = self
+    relation.query_string = query
+    relation.execute
+  end
+
   def select(*cols)
     #create the string of select fields
     if cols.is_a?(String)

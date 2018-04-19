@@ -6,7 +6,7 @@ class Relation
   end
 
   def execute
-    query_string = "
+    query_string = self.query_string || "
       SELECT #{@select_line || '*'}
       FROM #{@from_line}
       #{@where_line ? "WHERE #{@where_line}" : nil}
