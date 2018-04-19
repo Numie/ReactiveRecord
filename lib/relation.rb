@@ -3,7 +3,6 @@ class Relation
   :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
 
   def initialize
-    @joined_models = []
   end
 
   def execute
@@ -34,7 +33,7 @@ class Relation
     #{query_string}
     SQL
 
-    return hashes if self.group_line
+    return hashes if self.group_line || self.joins_line
 
     #create array of objects from each hash
     hashes.map { |hash| self.model_name.new(hash) }
@@ -51,20 +50,25 @@ class Relation
   end
 
   def joins(association)
-    if self.model_name.assoc_options[association].nil?
-      raise "#{association} is not a valid association of #{self.model_name}"
+    joined_model = nil
+    self.joined_models.each do |model|
+      if model.assoc_options[association]
+        joined_model = model
+      end
     end
 
-    join_class_name = self.model_name.assoc_options[association].class_name
+    raise "#{association} is not a valid association." unless joined_model
+
+    join_class_name = joined_model.assoc_options[association].class_name
     join_table_name = join_class_name.constantize.table_name
 
-    foreign_key = self.model_name.assoc_options[association].foreign_key
-    type = self.model_name.columns.include?(foreign_key) ? :belongs_to : :has_many
+    foreign_key = joined_model.assoc_options[association].foreign_key
+    type = joined_model.columns.include?(foreign_key) ? :belongs_to : :has_many
 
     if type == :belongs_to
-      joins_line = "INNER JOIN #{join_table_name} ON #{self.from_line}.#{foreign_key} = #{join_table_name}.id"
+      joins_line = "INNER JOIN #{join_table_name} ON #{joined_model.table_name}.#{foreign_key} = #{join_table_name}.id"
     else
-      joins_line = "INNER JOIN #{join_table_name} ON #{self.from_line}.id = #{join_table_name}.#{foreign_key}"
+      joins_line = "INNER JOIN #{join_table_name} ON #{joined_model.table_name}.id = #{join_table_name}.#{foreign_key}"
     end
 
     if self.joins_line
@@ -73,6 +77,7 @@ class Relation
       self.joins_line = "#{joins_line}"
     end
 
+    self.joined_models << join_class_name.constantize
     self
   end
 
