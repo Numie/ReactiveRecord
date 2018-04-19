@@ -13,6 +13,8 @@ class Relation
       #{@group_line ? "GROUP BY #{@group_line}" : nil}
       #{@having_line ? "HAVING #{@having_line}" : nil}
       #{@order_line ? "ORDER BY #{@order_line}" : nil}
+      #{@limit_line ? "LIMIT #{@limit_line}" : nil}
+      #{@offset_line ? "OFFSET #{@offset_line}" : nil}
     "
 
     where_vals = self.where_vals
@@ -107,6 +109,16 @@ class Relation
     end
 
     self.order_line ? self.order_line += (", " + order_by_line) : self.order_line = order_by_line
+    self
+  end
+
+  def limit(n)
+    self.limit_line = n
+    self
+  end
+
+  def offset(n)
+    self.offset_line = n
     self
   end
 end
