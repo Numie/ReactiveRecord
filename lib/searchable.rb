@@ -18,25 +18,8 @@ module Searchable
       vals = cols.map(&:to_s).join(", ")
     end
 
-    hashes = DBConnection.execute(<<-SQL)
-    SELECT #{vals}
-    FROM #{self.table_name}
-    SQL
-
-    #create array of objects from each hash
-    hashes.map { |hash| self.new(hash) }
-  end
-
-  def lazy_select(*cols)
-    #create the string of select fields
-    if cols.is_a?(String)
-      vals = cols
-    else
-      vals = cols.map(&:to_s).join(", ")
-    end
-
     relation = Relation.new
-    relation.model_name, relation.from_line, relation.select_line = self.name.constantize, self.table_name, vals
+    relation.model_name, relation.from_line, relation.joined_models, relation.select_line = self.name.constantize, self.table_name, [self.name.constantize], vals
     relation
   end
 
@@ -55,33 +38,8 @@ module Searchable
       raise 'RubyORGem Error'
     end
 
-    hashes = DBConnection.execute(<<-SQL, vals)
-    SELECT *
-    FROM #{self.table_name}
-    WHERE #{where_line}
-    SQL
-
-    #create array of objects from each hash
-    hashes.map { |hash| self.new(hash) }
-  end
-
-  def lazy_where(params, *args)
-    #create the string of where conditions
-    if params.is_a?(Hash)
-      where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
-      vals = params.values
-    elsif args
-      where_line = params
-      vals = args
-    elsif params.is_a?(String)
-      where_line = params
-      vals = []
-    else
-      raise 'RubyORGem Error'
-    end
-
     relation = Relation.new
-    relation.model_name, relation.from_line, relation.where_line, relation.where_vals = self.name.constantize, self.table_name, where_line, vals
+    relation.model_name, relation.from_line, relation.joined_models, relation.where_line, relation.where_vals = self.name.constantize, self.table_name, [self.name.constantize], where_line, vals
     relation
   end
 
@@ -99,24 +57,14 @@ module Searchable
       order_by_line = string_cols.join(", ")
     end
 
-    hashes = DBConnection.execute(<<-SQL)
-    SELECT *
-    FROM #{self.table_name}
-    ORDER BY #{order_by_line}
-    SQL
-
-    #create array of objects from each hash
-    hashes.map { |hash| self.new(hash) }
+    relation = Relation.new
+    relation.model_name, relation.from_line, relation.joined_models, relation.order_line = self.name.constantize, self.table_name, [self.name.constantize], order_by_line
+    relation
   end
 
   def limit(n)
-    hashes = DBConnection.execute(<<-SQL)
-    SELECT *
-    FROM #{self.table_name}
-    LIMIT #{n}
-    SQL
-
-    #create array of objects from each hash
-    hashes.map { |hash| self.new(hash) }
+    relation = Relation.new
+    relation.model_name, relation.from_line, relation.joined_models, relation.limit_line = self.name.constantize, self.table_name, [self.name.constantize], n
+    relation
   end
 end
