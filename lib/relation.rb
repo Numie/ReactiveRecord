@@ -1,9 +1,9 @@
 class Relation
-  attr_accessor :model_name, :select_line, :from_line, :joins_line, :where_line, :where_vals,
+  attr_accessor :model_name, :select_line, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
   :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
 
   def initialize
-    @num_joins = 0
+    @joined_models = []
   end
 
   def execute
@@ -42,7 +42,12 @@ class Relation
 
   def method_missing(method, *args)
     arr = self.execute
-    arr.send(method, *args)
+
+    if (Array.instance_methods - Object.instance_methods).include?(method)
+      arr.send(method, *args)
+    else
+      super
+    end
   end
 
   def joins(association)
