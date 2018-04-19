@@ -1,14 +1,16 @@
 class Relation
-  attr_accessor :model_name, :select_line, :from_line, :joins_line, :where_line, :where_vals, :group_line,
-  :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
+  attr_accessor :model_name, :select_line, :from_line, :joins_line, :where_line, :where_vals,
+  :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
 
   def initialize
+    @num_joins = 0
   end
 
   def execute
     query_string = self.query_string || "
       SELECT #{@select_line || '*'}
       FROM #{@from_line}
+      #{@joins_line}
       #{@where_line ? "WHERE #{@where_line}" : nil}
       #{@group_line ? "GROUP BY #{@group_line}" : nil}
       #{@having_line ? "HAVING #{@having_line}" : nil}
@@ -41,6 +43,32 @@ class Relation
   def method_missing(method, *args)
     arr = self.execute
     arr.send(method, *args)
+  end
+
+  def joins(association)
+    if self.model_name.assoc_options[association].nil?
+      raise "#{association} is not a valid association of #{self.model_name}"
+    end
+
+    join_class_name = self.model_name.assoc_options[association].class_name
+    join_table_name = join_class_name.constantize.table_name
+
+    foreign_key = self.model_name.assoc_options[association].foreign_key
+    type = self.model_name.columns.include?(foreign_key) ? :belongs_to : :has_many
+
+    if type == :belongs_to
+      joins_line = "INNER JOIN #{join_table_name} ON #{self.from_line}.#{foreign_key} = #{join_table_name}.id"
+    else
+      joins_line = "INNER JOIN #{join_table_name} ON #{self.from_line}.id = #{join_table_name}.#{foreign_key}"
+    end
+
+    if self.joins_line
+      self.joins_line += "\n#{joins_line}"
+    else
+      self.joins_line = "#{joins_line}"
+    end
+
+    self
   end
 
   def where(params, *args)
