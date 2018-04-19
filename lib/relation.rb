@@ -9,12 +9,15 @@ class Relation
       SELECT #{@select_line || '*'}
       FROM #{@from_line}
       #{@where_line ? "WHERE #{@where_line}" : nil}
+      #{@group_line ? "GROUP BY #{@group_line}" : nil}
     "
 
     where_vals = self.where_vals
     hashes = DBConnection.execute(<<-SQL, where_vals)
     #{query_string}
     SQL
+
+    return hashes if self.group_line
 
     #create array of objects from each hash
     hashes.map { |hash| self.model_name.new(hash) }
@@ -45,5 +48,14 @@ class Relation
     self
   end
 
+  def group(col)
+    if col.is_a?(String)
+      group_line = col
+    else
+      group_line = col.to_s
+    end
 
+    self.group_line = group_line
+    self
+  end
 end
