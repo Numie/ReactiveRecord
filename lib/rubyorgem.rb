@@ -4,6 +4,15 @@ class Person < SQLObject
   belongs_to :house
   has_one_through :region, :house, :region
 
+  has_many :pets
+
+  finalize!
+end
+
+class Pet < SQLObject
+  belongs_to :person
+  has_one_through :house, :person, :house
+
   finalize!
 end
 

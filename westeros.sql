@@ -91,4 +91,4 @@ VALUES
   (6, "Ghost", "Dire Wolf", 8),
   (7, "Drogon", "Dragon", 30),
   (8, "Rhaegal", "Dragon", 30),
-  (9, "Viserion", "Dragon", 30),
+  (9, "Viserion", "Dragon", 30);
