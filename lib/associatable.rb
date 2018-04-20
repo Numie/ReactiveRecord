@@ -6,6 +6,7 @@ module Associatable
     #hash of associations
     @assoc_options ||= {}
     @assoc_options
+    @through_options ||= {}
   end
 
   def belongs_to(name, options = {})

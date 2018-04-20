@@ -57,6 +57,18 @@ class Relation
       end
     end
 
+    if !joined_model
+      self.joined_models.each do |model|
+        model.assoc_options.keys.each do |assoc|
+          next_model = model.assoc_options[assoc].class_name.constantize
+          if next_model.assoc_options.keys.include?(association)
+            joined_model = next_model
+            through_assoc = true
+          end
+        end
+      end
+    end
+
     raise "#{association} is not a valid association." unless joined_model
 
     join_class_name = joined_model.assoc_options[association].class_name
