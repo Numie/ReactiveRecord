@@ -7,6 +7,15 @@ CREATE TABLE people (
   FOREIGN KEY(house_id) REFERENCES house(id)
 );
 
+CREATE TABLE pets (
+  id INTEGER PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  species VARCHAR(255) NOT NULL,
+  person_id INTEGER,
+
+  FOREIGN KEY(person_id) REFERENCES person(id)
+);
+
 CREATE TABLE houses (
   id INTEGER PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -70,3 +79,16 @@ VALUES
   (28, "Asha", "Greyjoy", 6),
   (29, "Euron", "Greyjoy", 6),
   (30, "Daenerys", "Targaryen", 7);
+
+INSERT INTO
+  pets (id, name, species, person_id)
+VALUES
+  (1, "Grey Wind", "Dire Wolf", 3),
+  (2, "Lady", "Dire Wolf", 4),
+  (3, "Nymeria", "Dire Wolf", 5),
+  (4, "Summer", "Dire Wolf", 6),
+  (5, "Shaggydog", "Dire Wolf", 7),
+  (6, "Ghost", "Dire Wolf", 8),
+  (7, "Drogon", "Dragon", 30),
+  (8, "Rhaegal", "Dragon", 30),
+  (9, "Viserion", "Dragon", 30),
