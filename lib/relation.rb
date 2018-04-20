@@ -51,6 +51,7 @@ class Relation
 
   def joins(association)
     joined_model = nil
+    source_association = nil
     self.joined_models.each do |model|
       if model.assoc_options[association]
         joined_model = model
@@ -59,12 +60,10 @@ class Relation
 
     if !joined_model
       self.joined_models.each do |model|
-        model.assoc_options.keys.each do |assoc|
-          next_model = model.assoc_options[assoc].class_name.constantize
-          if next_model.assoc_options.keys.include?(association)
-            joined_model = next_model
-            through_assoc = true
-          end
+        if model.through_options[association]
+          joined_model = model
+          source_association = model.through_options[association].source_name
+          association = model.through_options[association].through_name
         end
       end
     end
@@ -90,7 +89,7 @@ class Relation
     end
 
     self.joined_models << join_class_name.constantize
-    self
+    source_association ? self.joins(source_association) : self
   end
 
   def where(params, *args)

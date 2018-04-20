@@ -1,7 +1,7 @@
 require 'active_support/inflector'
 
 class AssocOptions
-  attr_accessor :foreign_key, :class_name, :primary_key
+  attr_accessor :foreign_key, :class_name, :primary_key, :through_name, :source_name
 
   def model_class
     self.class_name.constantize
@@ -44,5 +44,12 @@ class HasManyOptions < AssocOptions
       self.send("#{key}=", options[key] || defaults[key])
     end
 
+  end
+end
+
+class ThroughOptions < AssocOptions
+  def initialize(name, through_name, source_name)
+    @through_name = through_name
+    @source_name = source_name
   end
 end

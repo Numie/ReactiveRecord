@@ -5,7 +5,9 @@ module Associatable
   def assoc_options
     #hash of associations
     @assoc_options ||= {}
-    @assoc_options
+  end
+
+  def through_options
     @through_options ||= {}
   end
 
@@ -51,6 +53,7 @@ module Associatable
   end
 
   def has_one_through(name, through_name, source_name)
+    self.through_options[name] = ThroughOptions.new(name, through_name, source_name)
 
     define_method(name) do
       #associations have presumably been created already
