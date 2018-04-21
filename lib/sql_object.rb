@@ -1,6 +1,7 @@
 require_relative 'db_connection'
 require_relative 'searchable'
 require_relative 'associatable'
+require_relative 'errors'
 require 'active_support/inflector'
 
 class SQLObject
@@ -75,6 +76,7 @@ WHERE id = ?
       result.concat(hash)
     end
 
+    raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name} with 'id=#{id}'") if result.empty?
     result.length == 1 ? self.parse_all(result).first : self.parse_all(result)
   end
 
