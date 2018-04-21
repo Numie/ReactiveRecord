@@ -100,12 +100,13 @@ LIMIT ?
   end
 
   def self.find_by(params)
-    self.where(params).take(1)
+    result_array = self.where(params)
+    result_array.empty? ? nil : result_array.take(1)
   end
 
   def self.find_by!(params)
     result_array = self.where(params)
-    raise 'RubyORGem::RecordNotFound' if result_array.empty?
+    raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name}") if result_array.empty?
     result_array.take(1)
   end
 

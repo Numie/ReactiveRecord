@@ -9,7 +9,7 @@ class Relation
     query_lines = [
       "SELECT #{@select_line || '*'}",
       "FROM #{@from_line}",
-      "#{@joins_line}",
+      @joins_line ? "#{@joins_line}" : nil,
       @where_line ? "WHERE #{@where_line}" : nil,
       @group_line ? "GROUP BY #{@group_line}" : nil,
       @having_line ? "HAVING #{@having_line}" : nil,
@@ -49,7 +49,7 @@ class Relation
   def method_missing(method, *args)
     arr = self.execute
 
-    if (Array.instance_methods - Object.instance_methods).include?(method)
+    if arr.respond_to?(method)
       arr.send(method, *args)
     else
       super

@@ -41,7 +41,7 @@ Can also take an array of IDs:
 ```
 Region.find([1, 2])
 ```
-> The find method will raise a ReactiveRecord::RecordNotFound exception unless a matching record is found for all of the supplied primary keys.
+The find method will raise a ReactiveRecord::RecordNotFound exception unless a matching record is found for all of the supplied primary keys.
 
 ### ::find_by(params)
 Returns the first result that matches the query.
@@ -53,7 +53,7 @@ Region.find_by(name: 'The North')
 Same as ::find_by but returns an error when no results are found:
 ```
 Region.find_by!(name: 'The West')
->> RubyORGem::RecordNotFound
+>> ReactiveRecord::RecordNotFound: Couldn't find Region
 ```
 
 ### ::take(n)
