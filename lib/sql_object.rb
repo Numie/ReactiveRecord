@@ -12,8 +12,8 @@ class SQLObject
 
     #returns a nested array, the first element of which is an array of column names
     table_info = DBConnection.execute2(<<-SQL)
-    SELECT *
-    FROM #{self.table_name}
+SELECT *
+FROM #{self.table_name}
     SQL
 
     #returns a list of column names as symbols
@@ -51,8 +51,8 @@ class SQLObject
 
   def self.all
     hashes = DBConnection.execute(<<-SQL)
-    SELECT *
-    FROM #{self.table_name}
+SELECT *
+FROM #{self.table_name}
     SQL
 
     self.parse_all(hashes)
@@ -68,9 +68,9 @@ class SQLObject
     result = []
     ids.each do |id|
       hash = DBConnection.execute(<<-SQL, id)
-      SELECT *
-      FROM #{self.table_name}
-      WHERE id = ?
+SELECT *
+FROM #{self.table_name}
+WHERE id = ?
       SQL
       result.concat(hash)
     end
@@ -80,9 +80,9 @@ class SQLObject
 
   def self.take(n=1)
     hash = DBConnection.execute(<<-SQL, n)
-    SELECT *
-    FROM #{self.table_name}
-    LIMIT ?
+SELECT *
+FROM #{self.table_name}
+LIMIT ?
     SQL
 
     self.parse_all(hash)
@@ -109,8 +109,8 @@ class SQLObject
 
   def self.pluck(col)
     hash = DBConnection.execute(<<-SQL, col)
-    SELECT #{col}
-    FROM #{self.table_name}
+SELECT #{col}
+FROM #{self.table_name}
     SQL
 
     self.parse_all(hash)
@@ -144,8 +144,8 @@ class SQLObject
     question_marks = col_names.split(", ").map { |c| "?" }.join(", ")
 
     DBConnection.execute(<<-SQL, *attribute_values[1..-1])
-    INSERT INTO #{self.class.table_name} (#{col_names})
-    VALUES (#{question_marks})
+INSERT INTO #{self.class.table_name} (#{col_names})
+VALUES (#{question_marks})
     SQL
 
     self.id = DBConnection.last_insert_row_id
@@ -155,9 +155,9 @@ class SQLObject
     set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
 
     DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
-    UPDATE #{self.class.table_name}
-    SET #{set_line}
-    WHERE id = ?
+UPDATE #{self.class.table_name}
+SET #{set_line}
+WHERE id = ?
     SQL
   end
 

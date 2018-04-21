@@ -1,7 +1,6 @@
 require 'sqlite3'
 
 PRINT_QUERIES = true
-# https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
 ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
 WESTEROS_SQL_FILE = File.join(ROOT_FOLDER, 'westeros.sql')
 WESTEROS_DB_FILE = File.join(ROOT_FOLDER, 'westeros.db')
@@ -11,7 +10,6 @@ class DBConnection
     @db = SQLite3::Database.new(db_file_name)
     @db.results_as_hash = true
     @db.type_translation = true
-
     @db
   end
 
@@ -27,7 +25,6 @@ class DBConnection
 
   def self.instance
     reset if @db.nil?
-
     @db
   end
 
@@ -53,7 +50,7 @@ class DBConnection
     puts '--------------------'
     puts query
     unless interpolation_args.empty? || interpolation_args == [nil]
-      puts "\n    interpolate: #{interpolation_args.flatten.inspect}"
+      puts "\ninterpolate: #{interpolation_args.flatten.inspect}"
     end
     puts '--------------------'
   end

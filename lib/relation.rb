@@ -8,14 +8,14 @@ class Relation
   def execute
     query_lines = [
       "SELECT #{@select_line || '*'}",
-      "    FROM #{@from_line}",
-      "    #{@joins_line}",
-      @where_line ? "    WHERE #{@where_line}" : nil,
-      @group_line ? "    GROUP BY #{@group_line}" : nil,
-      @having_line ? "    HAVING #{@having_line}" : nil,
-      @order_line ? "    ORDER BY #{@order_line}" : nil,
-      @limit_line ? "    LIMIT #{@limit_line}" : nil,
-      @offset_line ? "    OFFSET #{@offset_line}" : nil
+      "FROM #{@from_line}",
+      "#{@joins_line}",
+      @where_line ? "WHERE #{@where_line}" : nil,
+      @group_line ? "GROUP BY #{@group_line}" : nil,
+      @having_line ? "HAVING #{@having_line}" : nil,
+      @order_line ? "ORDER BY #{@order_line}" : nil,
+      @limit_line ? "LIMIT #{@limit_line}" : nil,
+      @offset_line ? "OFFSET #{@offset_line}" : nil
     ]
 
     constructed_query_string = ""
@@ -37,7 +37,7 @@ class Relation
     end
 
     hashes = DBConnection.execute(<<-SQL, vals)
-    #{query_string}
+#{query_string}
     SQL
 
     return hashes if self.group_line || self.joins_line
@@ -90,7 +90,7 @@ class Relation
     end
 
     if self.joins_line
-      self.joins_line += "\n    #{joins_line}"
+      self.joins_line += "\n#{joins_line}"
     else
       self.joins_line = "#{joins_line}"
     end

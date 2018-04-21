@@ -75,11 +75,11 @@ module Associatable
       foreign_key_val = self.send(through_foreign_key)
 
       results = DBConnection.execute(<<-SQL, foreign_key_val)
-        SELECT #{source_table_name}.*
-        FROM #{through_table_name}
-        JOIN #{source_table_name}
-        ON #{through_table_name}.#{source_foreign_key} = #{source_table_name}.#{source_primary_key}
-        WHERE #{through_table_name}.#{through_primary_key} = ?
+SELECT #{source_table_name}.*
+FROM #{through_table_name}
+JOIN #{source_table_name}
+ON #{through_table_name}.#{source_foreign_key} = #{source_table_name}.#{source_primary_key}
+WHERE #{through_table_name}.#{through_primary_key} = ?
       SQL
 
       source_options.model_class.parse_all(results).first
@@ -106,17 +106,17 @@ module Associatable
       source_primary_key = source_options.primary_key
       source_foreign_key = source_options.foreign_key
 
-      foreign_key_val = self.send(through_foreign_key)
+      foreign_key_val = self.id
 
       results = DBConnection.execute(<<-SQL, foreign_key_val)
-        SELECT #{source_table_name}.*
-        FROM #{through_table_name}
-        JOIN #{source_table_name}
-        ON #{through_table_name}.#{source_foreign_key} = #{source_table_name}.#{source_primary_key}
-        WHERE #{through_table_name}.#{through_primary_key} = ?
+SELECT #{source_table_name}.*
+FROM #{through_table_name}
+JOIN #{source_table_name}
+ON #{source_table_name}.#{source_foreign_key} = #{through_table_name}.#{source_primary_key}
+WHERE #{through_table_name}.#{through_foreign_key} = ?
       SQL
 
-      source_options.model_class.parse_all(results).first
+      source_options.model_class.parse_all(results)
     end
   end
 end

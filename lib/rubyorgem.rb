@@ -25,6 +25,7 @@ end
 
 class Region < SQLObject
   has_many :houses
+  has_many_through :people, :houses, :people
 
   finalize!
 end
