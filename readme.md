@@ -3,7 +3,7 @@
 ## Setup Instructions
 
 1. Clone the repo.
-2. Navigate into the Ruby_O_R_Gem directory in the terminal.
+2. Navigate into the ReactiveRecord directory in the terminal.
 3. Run:
 ```
 bundle install
@@ -11,10 +11,10 @@ cat westeros.sql | sqlite3 westeros.db
  ```
 4. Start pry and load the entry file:
 ```
-load 'lib/rubyorgem.rb'
+load 'reactiverecord.rb'
 ```
 
-## Classes and Their Ruby ORGem Associations
+## Classes and Their ReactiveRecord Associations
 
 1. Person
 1. House
