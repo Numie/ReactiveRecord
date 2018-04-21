@@ -41,6 +41,7 @@ Can also take an array of IDs:
 ```
 Region.find([1, 2])
 ```
+> The find method will raise a ReactiveRecord::RecordNotFound exception unless a matching record is found for all of the supplied primary keys.
 
 ### ::find_by(params)
 Returns the first result that matches the query.

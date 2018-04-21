@@ -73,10 +73,10 @@ SELECT *
 FROM #{self.table_name}
 WHERE id = ?
       SQL
+      raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name} with 'id'=#{id}") if hash.empty?
       result.concat(hash)
     end
 
-    raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name} with 'id=#{id}'") if result.empty?
     result.length == 1 ? self.parse_all(result).first : self.parse_all(result)
   end
 
