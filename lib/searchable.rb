@@ -24,7 +24,12 @@ module Searchable
   end
 
   def joins(association)
-    if self.assoc_options[association].nil?
+    if self.assoc_options[association]
+      source_association = nil
+    elsif self.through_options[association]
+      source_association = self.through_options[association].source_name
+      association = self.through_options[association].through_name
+    else
       raise "#{association} is not a valid association of #{self.name}"
     end
 
@@ -42,7 +47,7 @@ module Searchable
 
     relation = Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.joins_line = self.name.constantize, self.table_name, [self.name.constantize, join_class_name.constantize], joins_line
-    relation
+    source_association ? relation.joins(source_association) : relation
   end
 
   def where(params, *args)
