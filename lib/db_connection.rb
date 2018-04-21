@@ -1,6 +1,6 @@
 require 'sqlite3'
 
-PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
+PRINT_QUERIES = true
 # https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
 ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
 WESTEROS_SQL_FILE = File.join(ROOT_FOLDER, 'westeros.sql')
@@ -52,8 +52,8 @@ class DBConnection
 
     puts '--------------------'
     puts query
-    unless interpolation_args.empty?
-      puts "interpolate: #{interpolation_args.inspect}"
+    unless interpolation_args.empty? || interpolation_args == [nil]
+      puts "\n    interpolate: #{interpolation_args.flatten.inspect}"
     end
     puts '--------------------'
   end

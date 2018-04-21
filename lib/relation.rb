@@ -6,17 +6,24 @@ class Relation
   end
 
   def execute
-    query_string = self.query_string || "
-      SELECT #{@select_line || '*'}
-      FROM #{@from_line}
-      #{@joins_line}
-      #{@where_line ? "WHERE #{@where_line}" : nil}
-      #{@group_line ? "GROUP BY #{@group_line}" : nil}
-      #{@having_line ? "HAVING #{@having_line}" : nil}
-      #{@order_line ? "ORDER BY #{@order_line}" : nil}
-      #{@limit_line ? "LIMIT #{@limit_line}" : nil}
-      #{@offset_line ? "OFFSET #{@offset_line}" : nil}
-    "
+    query_lines = [
+      "SELECT #{@select_line || '*'}",
+      "    FROM #{@from_line}",
+      "    #{@joins_line}",
+      @where_line ? "    WHERE #{@where_line}" : nil,
+      @group_line ? "    GROUP BY #{@group_line}" : nil,
+      @having_line ? "    HAVING #{@having_line}" : nil,
+      @order_line ? "    ORDER BY #{@order_line}" : nil,
+      @limit_line ? "    LIMIT #{@limit_line}" : nil,
+      @offset_line ? "    OFFSET #{@offset_line}" : nil
+    ]
+
+    constructed_query_string = ""
+    query_lines.each do |line|
+      constructed_query_string += "#{line}\n" unless line.nil? || line == "    "
+    end
+
+    query_string = self.query_string || constructed_query_string.chomp
 
     where_vals = self.where_vals
     having_vals = self.having_vals
@@ -83,7 +90,7 @@ class Relation
     end
 
     if self.joins_line
-      self.joins_line += "\n#{joins_line}"
+      self.joins_line += "\n    #{joins_line}"
     else
       self.joins_line = "#{joins_line}"
     end
