@@ -11,9 +11,9 @@ CREATE TABLE pets (
   id INTEGER PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   species VARCHAR(255) NOT NULL,
-  person_id INTEGER,
+  owner_id INTEGER,
 
-  FOREIGN KEY(person_id) REFERENCES person(id)
+  FOREIGN KEY(owner_id) REFERENCES person(id)
 );
 
 CREATE TABLE houses (
@@ -121,7 +121,7 @@ VALUES
   (51, "Trystane", "Martell", 16);
 
 INSERT INTO
-  pets (id, name, species, person_id)
+  pets (id, name, species, owner_id)
 VALUES
   (1, "Grey Wind", "Dire Wolf", 3),
   (2, "Lady", "Dire Wolf", 4),

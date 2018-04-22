@@ -1,30 +1,59 @@
 # README
 
+ReactiveRecord is a custom-built version of ActiveRecord
+
 ## Setup Instructions
 
 1. Clone the repo.
 2. Navigate into the ReactiveRecord directory in the terminal.
-3. Run:
+3. Run 'bundle install' and create the database file:
 ```
 bundle install
 cat westeros.sql | sqlite3 westeros.db
  ```
 4. Start pry and load the entry file:
 ```
+pry
 load 'reactiverecord.rb'
 ```
 
-## Classes and Their ReactiveRecord Associations
+## Example ReactiveRecord Models and Associations
 
-1. Person
-1. House
-1. Region
+Code examples throughout this guide will refer to one or more of the following models:
 
-A Person belongs to a House and a Region.
-A House belongs to a Region and has many People.
-A Region has many Houses.
+```
+class Person < ReactiveRecord::Base
+  belongs_to :house
+  has_one_through :region, :house, :region
+  has_many :pets, foreign_key: :owner_id
+end
+```
 
-## General Methods
+```
+class Pet < ReactiveRecord::Base
+  belongs_to :owner, class_name: 'Person'
+  has_one_through :house, :owner, :house
+  has_one_through :region, :house, :region
+end
+```
+
+```
+class House < ReactiveRecord::Base
+  belongs_to :region
+  has_many :people, class_name: 'Person'
+  has_many_through :pets, :people, :pets
+end
+```
+
+```
+class Region < ReactiveRecord::Base
+  has_many :houses
+  has_many_through :people, :houses, :people
+  has_many_through :pets, :people, :pets
+end
+```
+
+## Retrieving Objects from the Database
 
 ### ::all
 See a list of the houses of Westeros.
@@ -127,14 +156,14 @@ Person.limit(3)
 ### #insert
 Insert Lancel Lannister.
 ```
-lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 2)
+lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 10)
 lancel.insert
 ```
 
 ### #update
 Update Theon Greyjoy.
 ```
-theon = Person.find(27)
+theon = Person.find(25)
 theon.house_id = 1
 theon.update
 ```
@@ -158,23 +187,37 @@ eddard = Person.find(1)
 eddard.region
 ```
 
-### House#people
-Find all people in House Stark.
+### Person#pets
+Find Daenerys Targaryen's dragons.
 ```
-stark = House.find(1)
-stark.people
+dany = Person.find(40)
+dany.pets
+```
+
+### Pet#owner
+Find the owner of Grey Wind.
+```
+grey_wind = Pet.find(1)
+grey_wind.owner
+```
+
+### House#people
+Find all people in House Baratheon.
+```
+baratheon = House.find(12)
+baratheon.people
 ```
 
 ### House#region
-Find the region of House Stark.
+Find the region of House Tully.
 ```
-stark = House.find(1)
-stark.region
+tully = House.find(5)
+tully.region
 ```
 
 ### Region#houses
-Find all the houses in the South.
+Find the houses in the North.
 ```
-south = Region.find(2)
-south.houses
+north = Region.find(1)
+north.houses
 ```

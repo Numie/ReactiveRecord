@@ -1,31 +1,33 @@
-require_relative 'lib/sql_object'
+require_relative 'lib/base'
 
-class Person < SQLObject
+class Person < ReactiveRecord::Base
   belongs_to :house
   has_one_through :region, :house, :region
-
-  has_many :pets
-
-  finalize!
-end
-
-class Pet < SQLObject
-  belongs_to :person
-  has_one_through :house, :person, :house
+  has_many :pets, foreign_key: :owner_id
 
   finalize!
 end
 
-class House < SQLObject
+class Pet < ReactiveRecord::Base
+  belongs_to :owner, class_name: 'Person'
+  has_one_through :house, :owner, :house
+  has_one_through :region, :house, :region
+
+  finalize!
+end
+
+class House < ReactiveRecord::Base
   belongs_to :region
   has_many :people, class_name: 'Person'
+  has_many_through :pets, :people, :pets
 
   finalize!
 end
 
-class Region < SQLObject
+class Region < ReactiveRecord::Base
   has_many :houses
   has_many_through :people, :houses, :people
+  has_many_through :pets, :people, :pets
 
   finalize!
 end
