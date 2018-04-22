@@ -2,14 +2,11 @@
 
 ReactiveRecord is a custom-built version of ActiveRecord.
 
-Methods that find a single entity, such as find and first, return a single instance of the model.
-Methods that return a collection, such as where and group, return an instance of ReactiveRecord::Relation. 
-
 ## Setup Instructions
 
 1. Clone the repo.
 2. Navigate into the ReactiveRecord directory in the terminal.
-3. Run 'bundle install' and create the database file:
+3. Run `bundle install` and create the database file:
 ```
 bundle install
 cat westeros.sql | sqlite3 westeros.db
@@ -22,7 +19,7 @@ load 'reactiverecord.rb'
 
 ## Example ReactiveRecord Models and Associations
 
-Code examples throughout this guide will refer to one or more of the following models:
+This guide will use a sample database called Westeros.db. Code examples will refer to one or more of the following models:
 
 ```
 class Person < ReactiveRecord::Base
@@ -57,6 +54,10 @@ end
 ```
 
 ## Retrieving Objects from the Database
+
+To retrieve objects from the database, ReactiveRecord provides several finder methods. Each finder method allows you to pass arguments into it to perform certain queries on your database without writing raw SQL.
+
+Methods that find a single entity, such as `find` and `first`, return a single instance of the model. Methods that return a collection, such as `where` and `group`, return an instance of ReactiveRecord::Relation.
 
 ### ::all
 See a list of the regions of Westeros.
@@ -106,7 +107,9 @@ Find the last house in the database, House Martell.
 House.last
 ```
 
-## ReactiveRecord Relations
+## Selecting Specific Fields
+
+By default, `Model.find` selects all the fields from the result set using `select *`. To select only a subset of fields from the result set, you can specify the subset via the `select` method.
 
 ### ::select(column_names)
 Find the ID and name of each House.
@@ -116,6 +119,12 @@ House.select(:id, :name)
 Also accepts a string:
 ```
 House.select('id, name')
+```
+Be careful: `select` allows you to initialize a model object with only the fields that you've selected. If you attempt to access a field that is not in the initialized record you'll receive a ReactiveModel::MissingAttribute error.
+```
+stark = House.select(:name).first
+stark.sigil
+>> ReactiveModel::MissingAttribute: Missing attribute: sigil
 ```
 
 ### ::where(params)
@@ -163,9 +172,6 @@ Person.limit(3)
 ### #insert
 Insert Lancel Lannister.
 ```
-Person.find_by(first_name: 'Lancel')
->> nil
-
 lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 10)
 lancel.insert
 

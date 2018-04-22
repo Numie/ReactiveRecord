@@ -1,6 +1,7 @@
 require_relative 'db_connection'
 require_relative 'searchable'
 require_relative 'associatable'
+require_relative 'relation'
 require_relative 'errors'
 require 'active_support/inflector'
 
@@ -28,7 +29,9 @@ FROM #{self.table_name}
       cols.each do |col|
         #define getter
         define_method(col) do
-          self.attributes[col]
+          val = self.attributes[col]
+          raise ReactiveModel::MissingAttribute.new("Missing attribute: #{col}") unless val
+          val
         end
 
         #define setter
@@ -51,18 +54,15 @@ FROM #{self.table_name}
       @name || self.name.underscore.pluralize
     end
 
-    def self.all
-      hashes = DBConnection.execute(<<-SQL)
-SELECT *
-FROM #{self.table_name}
-      SQL
-
-      self.parse_all(hashes)
-    end
-
     def self.parse_all(results)
       #creates a new object from each hash
       results.map { |hash| self.new(hash) }
+    end
+
+    def self.all
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
+      relation
     end
 
     def self.find(ids)
@@ -82,13 +82,9 @@ WHERE id = ?
     end
 
     def self.take(n=1)
-      hash = DBConnection.execute(<<-SQL, n)
-SELECT *
-FROM #{self.table_name}
-LIMIT ?
-      SQL
-
-      self.parse_all(hash)
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.joined_models, relation.limit_line = self.name.constantize, self.table_name, [self.name.constantize], n
+      n == 1 ? relation.first : relation
     end
 
     def self.first

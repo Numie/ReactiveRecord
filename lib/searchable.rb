@@ -61,7 +61,7 @@ module Searchable
       where_line = params
       vals = []
     else
-      raise 'RubyORGem Error'
+      raise 'ReactiveRecord Error'
     end
 
     relation = ReactiveRecord::Relation.new
