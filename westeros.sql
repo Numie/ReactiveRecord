@@ -19,7 +19,9 @@ CREATE TABLE pets (
 CREATE TABLE houses (
   id INTEGER PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  seat VARCHAR(255) NOT NULL,
   sigil VARCHAR(255) NOT NULL,
+  words VARCHAR(255),
   region_id INTEGER,
 
   FOREIGN KEY(region_id) REFERENCES region(id)
@@ -33,18 +35,35 @@ CREATE TABLE regions (
 INSERT INTO
   regions (id, name)
 VALUES
-  (1, "The North"), (2, "The South");
+  (1, "The North"),
+  (2, "The Riverlands"),
+  (3, "The Vale"),
+  (4, "The Iron Islands"),
+  (5, "The Westerlands"),
+  (6, "The Stormlands"),
+  (7, "The Crownlands"),
+  (8, "The Reach"),
+  (9, "Dorne");
 
 INSERT INTO
-  houses (id, name, sigil, region_id)
+  houses (id, name, seat, sigil, words, region_id)
 VALUES
-  (1, "Stark", "Direwolf", 1),
-  (2, "Lannister", "Lion", 2),
-  (3, "Baratheon", "Stag", 2),
-  (4, "Tully", "Fish", 2),
-  (5, "Tyrell", "Rose", 2),
-  (6, "Greyjoy", "Kraken", 2),
-  (7, "Targaryen", "Three-Headed Dragon", 2);
+  (1, "Stark", "Winterfell", "Direwolf", "Winter is Coming", 1),
+  (2, "Bolton", "Dreadfort", "Flayed Man", "Our Blades are Sharp", 1),
+  (3, "Mormont", "Bear Island", "Bear", "Here We Stand", 1),
+  (4, "Reed", "Greywater Watch", "Lizard", NULL, 1),
+  (5, "Tully", "Riverrun", "Trout", "Family, Duty, Honor", 2),
+  (6, "Frey", "The Twins", "Two Towers", NULL, 2),
+  (7, "Arryn", "The Eyrie", "Falcon", "As High As Honor", 3),
+  (8, "Baelish", "The Fingers", "Mockingbird", NULL, 3),
+  (9, "Greyjoy", "Pyke", "Kraken", "We Do Not Sow", 4),
+  (10, "Lannister", "Casterly Rock", "Lion", "Hear Me Roar", 5),
+  (11, "Clegane", "Clegane's Keep", "Three Dogs", NULL, 5),
+  (12, "Baratheon", "Storm's End", "Stag", "Ours is the Fury", 6),
+  (13, "Targaryen", "Dragonstone", "Three-Headed Dragon", "Fire and Blood", 7),
+  (14, "Tyrell", "Highgarden", "Rose", "Growing Strong", 8),
+  (15, "Tarly", "Horn Hill", "Hunter", "First in Battle", 8),
+  (16, "Martell", "Sunspear", "Red Sun", "Unbowed, Unbent, Unbroken", 9);
 
 INSERT INTO
   people (id, first_name, last_name, house_id)
@@ -57,28 +76,49 @@ VALUES
   (6, "Bran", "Stark", 1),
   (7, "Rickon", "Stark", 1),
   (8, "Jon", "Snow", 1),
-  (9, "Tywin", "Lannister", 2),
-  (10, "Tyrion", "Lannister", 2),
-  (11, "Cersei", "Lannister", 2),
-  (12, "Jaime", "Lannister", 2),
-  (13, "Robert", "Baratheon", 3),
-  (14, "Stannis", "Baratheon", 3),
-  (15, "Renly", "Baratheon", 3),
-  (16, "Joffrey", "Baratheon", 3),
-  (17, "Myrcella", "Baratheon", 3),
-  (18, "Tommen", "Baratheon", 3),
-  (19, "Hoster", "Tully", 4),
-  (20, "Edmure", "Tully", 4),
-  (21, "Brynden", "Tully", 4),
-  (22, "Olenna", "Tyrell", 5),
-  (23, "Mace", "Tyrell", 5),
-  (24, "Loras", "Tyrell", 5),
-  (25, "Margaery", "Tyrell", 5),
-  (26, "Balon", "Greyjoy", 6),
-  (27, "Theon", "Greyjoy", 6),
-  (28, "Asha", "Greyjoy", 6),
-  (29, "Euron", "Greyjoy", 6),
-  (30, "Daenerys", "Targaryen", 7);
+  (9, "Roose", "Bolton", 2),
+  (10, "Ramsay", "Snow", 2),
+  (11, "Jeor", "Mormont", 3),
+  (12, "Jorah", "Mormont", 3),
+  (13, "Howland", "Reed", 4),
+  (14, "Meera", "Reed", 4),
+  (15, "Jojen", "Reed", 4),
+  (16, "Hoster", "Tully", 5),
+  (17, "Edmure", "Tully", 5),
+  (18, "Brynden", "Tully", 5),
+  (19, "Walder", "Frey", 6),
+  (20, "Jon", "Arryn", 7),
+  (21, "Lysa", "Arryn", 7),
+  (22, "Robert", "Arryn", 7),
+  (23, "Petyr", "Baelish", 8),
+  (24, "Balon", "Greyjoy", 9),
+  (25, "Theon", "Greyjoy", 9),
+  (26, "Asha", "Greyjoy", 9),
+  (27, "Euron", "Greyjoy", 9),
+  (28, "Tywin", "Lannister", 10),
+  (29, "Cersei", "Lannister", 10),
+  (30, "Jaime", "Lannister", 10),
+  (31, "Tyrion", "Lannister", 10),
+  (32, "Gregor", "Clegane", 11),
+  (33, "Sandor", "Clegane", 11),
+  (34, "Robert", "Baratheon", 12),
+  (35, "Stannis", "Baratheon", 12),
+  (36, "Renly", "Baratheon", 12),
+  (37, "Joffrey", "Baratheon", 12),
+  (38, "Myrcella", "Baratheon", 12),
+  (39, "Tommen", "Baratheon", 12),
+  (40, "Daenerys", "Targaryen", 13),
+  (41, "Viserys", "Targaryen", 13),
+  (42, "Olenna", "Tyrell", 14),
+  (43, "Mace", "Tyrell", 14),
+  (44, "Loras", "Tyrell", 14),
+  (45, "Margaery", "Tyrell", 14),
+  (46, "Randyll", "Tarly", 15),
+  (47, "Samwell", "Tarly", 15),
+  (48, "Doran", "Martell", 16),
+  (49, "Oberyn", "Martell", 16),
+  (50, "Ellaria", "Sand", 16),
+  (51, "Trystane", "Martell", 16);
 
 INSERT INTO
   pets (id, name, species, person_id)
@@ -89,6 +129,6 @@ VALUES
   (4, "Summer", "Dire Wolf", 6),
   (5, "Shaggydog", "Dire Wolf", 7),
   (6, "Ghost", "Dire Wolf", 8),
-  (7, "Drogon", "Dragon", 30),
-  (8, "Rhaegal", "Dragon", 30),
-  (9, "Viserion", "Dragon", 30);
+  (7, "Drogon", "Dragon", 40),
+  (8, "Rhaegal", "Dragon", 40),
+  (9, "Viserion", "Dragon", 40);
