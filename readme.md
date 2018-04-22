@@ -212,6 +212,43 @@ Same as the example above. but only for last names with greater than 2 people:
 Person.select('last_name, COUNT(*) AS count').group(:last_name).having('count > 2')
 ```
 
+## Joining Tables
+
+ReactiveRecord lets you use the names of the associations defined on a model as a shortcut for specifying `JOIN` clauses for those associations with the `joins` method.
+
+### ::joins
+Join people to their house:
+```
+Person.joins(:house)
+```
+This produces:
+```
+"SELECT *
+FROM people
+INNER JOIN houses ON people.house_id = houses.id"
+```
+You may also use a through association, which will produce multiple `JOINS` clauses:
+```
+Person.joins(:region)
+```
+This produces:
+```
+SELECT *
+FROM people
+INNER JOIN houses ON people.house_id = houses.id
+INNER JOIN regions ON houses.region_id = regions.id
+```
+
+## Finding By SQL
+
+If you'd like to use your own SQL to find records in a table you can use `find_by_sql`. The `find_by_sql` method will return an array of objects even if the underlying query returns just a single record.
+
+### ::find_by_sql
+Find Drogon with your own SQL:
+```
+Pet.find_by_sql("SELECT * FROM pets WHERE name = 'Drogon'")
+```
+
 ## Make Changes to the Database
 
 ### #insert
