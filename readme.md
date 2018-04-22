@@ -134,6 +134,7 @@ The `where` method allows you to specify conditions to limit the records returne
 ### ::where(params)
 
 **Pure String Conditions**
+
 Conditions may be specified with standard SQL syntax.
 ```
 Person.where("last_name = 'Stark'")
@@ -142,6 +143,7 @@ Person.where("last_name = 'Stark' AND first_name = 'Arya'")
 Building conditions as pure strings can leave you vulnerable to SQL injection attacks. See below for the preferred way to handle conditions using an array.
 
 **Array Conditions**
+
 ReactiveRecord will take the first argument as the conditions string and any additional arguments will replace the question marks (?) in it.
 ```
 Person.where('last_name = ?', 'Stark')
@@ -152,6 +154,7 @@ Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 ```
 
 **Hash Conditions**
+
 ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them:
 ```
 Person.where(last_name: 'Stark')
@@ -223,11 +226,11 @@ Person.joins(:house)
 ```
 This produces:
 ```
-"SELECT *
+SELECT *
 FROM people
-INNER JOIN houses ON people.house_id = houses.id"
+INNER JOIN houses ON people.house_id = houses.id
 ```
-You may also use a through association, which will produce multiple `JOINS` clauses:
+You may also use a through association, which will produce multiple `JOIN` clauses:
 ```
 Person.joins(:region)
 ```
@@ -274,6 +277,15 @@ Person.find(25).house
 
 ### #save
 Use 'save' in lieu of either 'insert' or 'update'.
+
+### #delete
+Delete Walder Frey.
+```
+walder = Person.find_by(first_name: 'Walder')
+walder.delete
+
+Person.find_by(first_name: 'Walder')
+```
 
 ## Association Methods
 

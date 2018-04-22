@@ -97,14 +97,11 @@ WHERE id = ?
     end
 
     def self.find_by(params)
-      result_array = self.where(params)
-      result_array.empty? ? nil : result_array.first
+      self.where(params).first || nil
     end
 
     def self.find_by!(params)
-      result_array = self.where(params)
-      raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name}") if result_array.empty?
-      result_array.first
+      self.where(params).first || raise(ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name}"))
     end
 
     def self.pluck(col)
@@ -163,6 +160,15 @@ WHERE id = ?
 
     def save
       self.id ? self.update : self.insert
+    end
+
+    def delete
+      id = self.id
+
+      DBConnection.execute(<<-SQL, id)
+DELETE FROM #{self.class.table_name}
+WHERE id = ?
+      SQL
     end
   end
 end
