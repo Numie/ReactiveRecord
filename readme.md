@@ -57,7 +57,7 @@ end
 
 To retrieve objects from the database, ReactiveRecord provides several finder methods. Each finder method allows you to pass arguments into it to perform certain queries on your database without writing raw SQL.
 
-Methods that find a single entity, such as `find` and `first`, return a single instance of the model. Methods that return a collection, such as `where` and `group`, return an instance of ReactiveRecord::Relation.
+Methods that find a single entity, such as `find` and `first`, return a single instance of the model. Methods that return a collection, such as `where` and `group`, return an instance of `ReactiveRecord::Relation`.
 
 ### ::all
 See a list of the regions of Westeros.
@@ -74,7 +74,7 @@ Can also take an array of IDs:
 ```
 Region.find([3, 4])
 ```
-The find method will raise a ReactiveRecord::RecordNotFound exception unless a matching record is found for all of the supplied primary keys.
+The find method will raise a `ReactiveRecord::RecordNotFound` exception unless a matching record is found for all of the supplied primary keys.
 
 ### ::find_by(params)
 Returns the first result that matches the query.
@@ -109,45 +109,60 @@ House.last
 
 ## Selecting Specific Fields
 
-By default, `Model.find` selects all the fields from the result set using `select *`. To select only a subset of fields from the result set, you can specify the subset via the `select` method.
+By default, `Model.find` selects all the fields from the result. To select only a subset of fields from the result set, you can specify the subset via the `select` method.
 
 ### ::select(column_names)
-Find the ID and name of each House.
+Find the name and sigil of each House.
 ```
-House.select(:id, :name)
+House.select(:name, :sigil)
 ```
 Also accepts a string:
 ```
-House.select('id, name')
+House.select('name, sigil')
 ```
-Be careful: `select` allows you to initialize a model object with only the fields that you've selected. If you attempt to access a field that is not in the initialized record you'll receive a ReactiveModel::MissingAttribute error.
+Be careful: `select` allows you to initialize a model object with only the fields that you've selected. If you attempt to access a field that is not in the initialized record you'll receive a `ReactiveModel::MissingAttribute` error.
 ```
 stark = House.select(:name).first
 stark.sigil
 >> ReactiveModel::MissingAttribute: Missing attribute: sigil
 ```
 
+## Conditions
+
+The `where` method allows you to specify conditions to limit the records returned. Conditions can either be specified as a string, array, or hash.
+
 ### ::where(params)
-Find the members of House Stark.
-```
-Person.where(last_name: 'Stark')
-```
-Also accepts a string with standard SQL syntax:
+
+**Pure String Conditions**
+Conditions may be specified with standard SQL syntax.
 ```
 Person.where("last_name = 'Stark'")
+Person.where("last_name = 'Stark' AND first_name = 'Arya'")
 ```
-Or syntax to protect against SQL injection attacks:
+Building conditions as pure strings can leave you vulnerable to SQL injection attacks. See below for the preferred way to handle conditions using an array.
+
+**Array Conditions**
+ReactiveRecord will take the first argument as the conditions string and any additional arguments will replace the question marks (?) in it.
 ```
 Person.where('last_name = ?', 'Stark')
 ```
-And multiple conditions:
+If you want to specify multiple conditions:
 ```
-Person.where(last_name: 'Stark', first_name: 'Arya')
-Person.where("last_name = 'Stark' AND first_name = 'Arya'")
 Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 ```
 
-### ::order(column_name)
+**Hash Conditions**
+ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them:
+```
+Person.where(last_name: 'Stark')
+Person.where(last_name: 'Stark', first_name: 'Arya')
+```
+
+## Ordering
+
+To retrieve records from the database in a specific order, you can use the `order` method. You can specify `ASC` (default) or `DESC`,  as well as order by multiple fields.
+
+### ::order(column_names)
 Order the houses by name or by multiple columns:
 ```
 House.order(:name)
@@ -161,10 +176,40 @@ House.order('name DESC')
 House.order('region_id, name DESC')
 ```
 
+## Limit and Offset
+
+You can use `limit` to specify the number of records to be retrieved, and use `offset` to specify the number of records to skip before starting to return the records.
+
 ### ::limit(n)
 Return the first 3 people:
 ```
 Person.limit(3)
+```
+
+### ::offset(n)
+Return the 5th-7th people:
+```
+Person.limit(3).offset(4)
+```
+
+## Group
+
+To apply a `GROUP BY` clause to the SQL query, you can use the `group` method.
+
+### ::group(columns_names)
+Return the last names in the database, and the count of people with each last name:
+```
+Person.select('last_name, COUNT(*) AS count').group(:last_name)
+```
+
+## Having
+
+You can add a `HAVING` clause to specify conditions on the `GROUP BY` fields with the `having` method.
+
+### ::having(params)
+Same as the example above. but only for last names with greater than 2 people:
+```
+Person.select('last_name, COUNT(*) AS count').group(:last_name).having('count > 2')
 ```
 
 ## Make Changes to the Database
