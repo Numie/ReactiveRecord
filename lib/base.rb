@@ -102,13 +102,13 @@ LIMIT ?
 
     def self.find_by(params)
       result_array = self.where(params)
-      result_array.empty? ? nil : result_array.take(1)
+      result_array.empty? ? nil : result_array.first
     end
 
     def self.find_by!(params)
       result_array = self.where(params)
       raise ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name}") if result_array.empty?
-      result_array.take(1)
+      result_array.first
     end
 
     def self.pluck(col)

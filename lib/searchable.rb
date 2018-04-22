@@ -3,7 +3,7 @@ require_relative 'relation'
 
 module Searchable
   def find_by_sql(query)
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name = self
     relation.query_string = query
     relation.execute
@@ -17,7 +17,7 @@ module Searchable
       vals = cols.map(&:to_s).join(", ")
     end
 
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.select_line = self.name.constantize, self.table_name, [self.name.constantize], vals
     relation
   end
@@ -44,7 +44,7 @@ module Searchable
       joins_line = "INNER JOIN #{join_table_name} ON #{self.table_name}.id = #{join_table_name}.#{foreign_key}"
     end
 
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.joins_line = self.name.constantize, self.table_name, [self.name.constantize, join_class_name.constantize], joins_line
     source_association ? relation.joins(source_association) : relation
   end
@@ -64,7 +64,7 @@ module Searchable
       raise 'RubyORGem Error'
     end
 
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.where_line, relation.where_vals = self.name.constantize, self.table_name, [self.name.constantize], where_line, vals
     relation
   end
@@ -83,13 +83,13 @@ module Searchable
       order_by_line = string_cols.join(", ")
     end
 
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.order_line = self.name.constantize, self.table_name, [self.name.constantize], order_by_line
     relation
   end
 
   def limit(n)
-    relation = Relation.new
+    relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.limit_line = self.name.constantize, self.table_name, [self.name.constantize], n
     relation
   end

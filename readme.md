@@ -1,6 +1,9 @@
 # README
 
-ReactiveRecord is a custom-built version of ActiveRecord
+ReactiveRecord is a custom-built version of ActiveRecord.
+
+Methods that find a single entity, such as find and first, return a single instance of the model.
+Methods that return a collection, such as where and group, return an instance of ReactiveRecord::Relation. 
 
 ## Setup Instructions
 
@@ -56,26 +59,26 @@ end
 ## Retrieving Objects from the Database
 
 ### ::all
-See a list of the houses of Westeros.
+See a list of the regions of Westeros.
 ```
-House.all
+Region.all
 ```
 
 ### ::find(ids)
-Identify 'The North'.
+Identify 'The Vale'.
 ```
-Region.find(1)
+Region.find(3)
 ```
 Can also take an array of IDs:
 ```
-Region.find([1, 2])
+Region.find([3, 4])
 ```
 The find method will raise a ReactiveRecord::RecordNotFound exception unless a matching record is found for all of the supplied primary keys.
 
 ### ::find_by(params)
 Returns the first result that matches the query.
 ```
-Region.find_by(name: 'The North')
+Region.find_by(name: 'The Reach')
 ```
 
 ### ::find_by!(params)
@@ -86,9 +89,9 @@ Region.find_by!(name: 'The West')
 ```
 
 ### ::take(n)
-Return Eddard, Catelyn and Robb Stark.
+Return Grey Wind, Lady and Nymeria.
 ```
-Person.take(3)
+Pet.take(3)
 ```
 
 ### ::first
@@ -98,10 +101,12 @@ House.first
 ```
 
 ### ::last
-Find the last house in the database, House Targaryen.
+Find the last house in the database, House Martell.
 ```
 House.last
 ```
+
+## ReactiveRecord Relations
 
 ### ::select(column_names)
 Find the ID and name of each House.
@@ -153,19 +158,30 @@ Return the first 3 people:
 Person.limit(3)
 ```
 
+## Make Changes to the Database
+
 ### #insert
 Insert Lancel Lannister.
 ```
+Person.find_by(first_name: 'Lancel')
+>> nil
+
 lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 10)
 lancel.insert
+
+Person.find_by(first_name: 'Lancel')
 ```
 
 ### #update
 Update Theon Greyjoy.
 ```
 theon = Person.find(25)
+theon.house
+
 theon.house_id = 1
 theon.update
+
+Person.find(25).house
 ```
 
 ### #save
