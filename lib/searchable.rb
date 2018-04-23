@@ -52,8 +52,21 @@ module Searchable
   def where(params, *args)
     #create the string of where conditions
     if params.is_a?(Hash)
-      where_line = params.keys.map { |param| "#{param} = ?"}.join(" AND ")
-      vals = params.values
+      vals = []
+      where_line = params.map do |param, val|
+        if val.is_a?(Range)
+          vals += [val.first, val.last]
+          "#{param} BETWEEN ? AND ?"
+        elsif val.is_a?(Array)
+          #create correct number of question marks
+          question_marks = val.map { |c| "?" }.join(", ")
+          vals += val
+          "#{param} IN (#{question_marks})"
+        else
+          vals << val
+          "#{param} = ?"
+        end
+      end.join(" AND ")
     elsif args
       where_line = params
       vals = args
