@@ -1,6 +1,6 @@
 module ReactiveRecord
   class Relation
-    attr_accessor :model_name, :select_line, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
+    attr_accessor :model_name, :select_line, :distinct, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
     :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
 
     def initialize
@@ -9,35 +9,39 @@ module ReactiveRecord
     def execute
       # default_select_line = self.joined_models.map { |model| "#{model.table_name}.*" }.join(', ')
 
-      default_selects = []
-      self.joined_models.each do |model|
-        table_name = model.table_name
-        singular_name = model.to_s.downcase
-        model.columns.each do |column|
-          default_selects << "#{table_name}.#{column.to_s} AS #{singular_name}_#{column.to_s}"
+      if !self.query_string
+        default_selects = []
+        self.joined_models.each do |model|
+          table_name = model.table_name
+          singular_name = model.to_s.downcase
+          model.columns.each do |column|
+            default_selects << "#{table_name}.#{column.to_s} AS #{singular_name}_#{column.to_s}"
+          end
         end
+
+        default_select_line = (self.group_line || self.joins_line) ? default_selects.join(', ') : '*'
+
+        query_lines = [
+          "SELECT #{self.distinct ? 'DISTINCT ' : ''}#{@select_line || default_select_line}",
+          "FROM #{@from_line}",
+          @joins_line ? "#{@joins_line}" : nil,
+          @where_line ? "WHERE #{@where_line}" : nil,
+          @group_line ? "GROUP BY #{@group_line}" : nil,
+          @having_line ? "HAVING #{@having_line}" : nil,
+          @order_line ? "ORDER BY #{@order_line}" : nil,
+          @limit_line ? "LIMIT #{@limit_line}" : nil,
+          @offset_line ? "OFFSET #{@offset_line}" : nil
+        ]
+
+        constructed_query_string = ""
+        query_lines.each do |line|
+          constructed_query_string += "#{line}\n" unless line.nil?
+        end
+
+        self.query_string = constructed_query_string.chomp
       end
 
-      default_select_line = (self.group_line || self.joins_line) ? default_selects.join(', ') : '*'
-
-      query_lines = [
-        "SELECT #{@select_line || default_select_line}",
-        "FROM #{@from_line}",
-        @joins_line ? "#{@joins_line}" : nil,
-        @where_line ? "WHERE #{@where_line}" : nil,
-        @group_line ? "GROUP BY #{@group_line}" : nil,
-        @having_line ? "HAVING #{@having_line}" : nil,
-        @order_line ? "ORDER BY #{@order_line}" : nil,
-        @limit_line ? "LIMIT #{@limit_line}" : nil,
-        @offset_line ? "OFFSET #{@offset_line}" : nil
-      ]
-
-      constructed_query_string = ""
-      query_lines.each do |line|
-        constructed_query_string += "#{line}\n" unless line.nil?
-      end
-
-      query_string = self.query_string || constructed_query_string.chomp
+      # query_string = self.query_string || constructed_query_string.chomp
 
       where_vals = self.where_vals
       having_vals = self.having_vals
@@ -68,6 +72,11 @@ module ReactiveRecord
       else
         super
       end
+    end
+
+    def distinct
+      self.distinct = true
+      self
     end
 
     def joins(association)

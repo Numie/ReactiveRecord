@@ -148,6 +148,17 @@ stark.sigil
 >> ReactiveModel::MissingAttribute: Missing attribute: sigil
 ```
 
+### ::distinct
+If you would like to only grab a single record per unique value in a certain field, you can use `distinct`:
+```
+Pet.select(:species).distinct
+```
+This produces:
+```
+SELECT DISTINCT species
+FROM pets
+```
+
 ## Conditions
 
 The `where` method allows you to specify conditions to limit the records returned. Conditions can either be specified as a string, array, or hash.
