@@ -155,22 +155,43 @@ Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 
 **Hash Conditions**
 
-ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them:
+ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them.
+
+\*Only equality, range and subset checking are possible with Hash conditions.
 
 *Equality Conditions*
 ```
-Person.where(last_name: 'Stark')
 Person.where(last_name: 'Stark', first_name: 'Arya')
+```
+This produces:
+```
+SELECT *
+FROM people
+WHERE last_name = 'Stark' AND first_name = 'Arya'
 ```
 
 *Range Conditions*
+To find records using the `BETWEEN` expression, pass a range to the conditions hash:
 ```
 Person.where(first_name: ('Arya'..'Jon'))
 ```
+This produces:
+```
+SELECT *
+FROM people
+WHERE first_name BETWEEN 'Arya' AND 'Jon'
+```
 
 *Subset Conditions*
+To find records using the `IN` expression, pass an array to the conditions hash:
 ```
 Person.where(first_name: ['Robert', 'Stannis', 'Renly'])
+```
+This produces:
+```
+SELECT *
+FROM people
+WHERE first_name IN ('Robert', 'Stannis', 'Renly')
 ```
 
 ## Ordering
@@ -225,6 +246,10 @@ You can add a `HAVING` clause to specify conditions on the `GROUP BY` fields wit
 Same as the example above. but only for last names with greater than 2 people:
 ```
 Person.select('last_name, COUNT(*) AS count').group(:last_name).having('count > 2')
+```
+The `having` method can also except equality, range and subset conditions as a hash just like `where`. To find last names with between 3 and 6 people:
+```
+Person.select('last_name, COUNT(*) AS count').group(:last_name).having(count: (3..6))
 ```
 
 ## Joining Tables
