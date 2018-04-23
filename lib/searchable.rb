@@ -23,6 +23,14 @@ module Searchable
   end
 
   def joins(association)
+    self.base_joins(association, "INNER JOIN")
+  end
+
+  def left_outer_joins(association)
+    self.base_joins(association, "LEFT OUTER JOIN")
+  end
+
+  def base_joins(association, join_type)
     if self.assoc_options[association]
       source_association = nil
     elsif self.through_options[association]
@@ -39,14 +47,14 @@ module Searchable
     type = self.columns.include?(foreign_key) ? :belongs_to : :has_many
 
     if type == :belongs_to
-      joins_line = "INNER JOIN #{join_table_name} ON #{self.table_name}.#{foreign_key} = #{join_table_name}.id"
+      joins_line = "#{join_type} #{join_table_name} ON #{self.table_name}.#{foreign_key} = #{join_table_name}.id"
     else
-      joins_line = "INNER JOIN #{join_table_name} ON #{self.table_name}.id = #{join_table_name}.#{foreign_key}"
+      joins_line = "#{join_type} #{join_table_name} ON #{self.table_name}.id = #{join_table_name}.#{foreign_key}"
     end
 
     relation = ReactiveRecord::Relation.new
     relation.model_name, relation.from_line, relation.joined_models, relation.joins_line = self.name.constantize, self.table_name, [self.name.constantize, join_class_name.constantize], joins_line
-    source_association ? relation.joins(source_association) : relation
+    source_association ? relation.base_joins(source_association, join_type) : relation
   end
 
   def where(params, *args)

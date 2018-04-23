@@ -276,19 +276,21 @@ Person.select('last_name, COUNT(*) AS count').group(:last_name).having(count: (3
 
 ## Joining Tables
 
-ReactiveRecord lets you use the names of the associations defined on a model as a shortcut for specifying `JOIN` clauses for those associations with the `joins` method.
+ReactiveRecord lets you use the associations defined on a model as a shortcut for specifying `JOIN` clauses for those associations with the `joins` and `left_outer_joins` methods.
 
 ### ::joins
-Join people to their house:
+Join people to their pets:
 ```
-Person.joins(:house)
+Person.joins(:pets)
 ```
 This produces:
 ```
 SELECT *
 FROM people
-INNER JOIN houses ON people.house_id = houses.id
+INNER JOIN pets ON people.id = pets.owner_id
 ```
+Only people who own pets will be returned. People with no pets will be omitted.
+
 You may also use a through association, which will produce multiple `JOIN` clauses:
 ```
 Person.joins(:region)
@@ -300,6 +302,18 @@ FROM people
 INNER JOIN houses ON people.house_id = houses.id
 INNER JOIN regions ON houses.region_id = regions.id
 ```
+
+## ::left_outer_joins
+```
+Person.joins(:pets)
+```
+This produces:
+```
+SELECT *
+FROM people
+LEFT OUTER JOIN pets ON people.id = pets.owner_id
+```
+All people and pets will be returned, even if a person does not own any pets.
 
 ## Finding By SQL
 

@@ -58,6 +58,14 @@ module ReactiveRecord
     end
 
     def joins(association)
+      self.base_joins(association, "INNER JOIN")
+    end
+
+    def left_outer_joins(association)
+      self.base_joins(association, "LEFT OUTER JOIN")
+    end
+
+    def base_joins(association, join_type)
       joined_model = nil
       source_association = nil
       self.joined_models.each do |model|
@@ -85,9 +93,9 @@ module ReactiveRecord
       type = joined_model.columns.include?(foreign_key) ? :belongs_to : :has_many
 
       if type == :belongs_to
-        joins_line = "INNER JOIN #{join_table_name} ON #{joined_model.table_name}.#{foreign_key} = #{join_table_name}.id"
+        joins_line = "#{join_type} #{join_table_name} ON #{joined_model.table_name}.#{foreign_key} = #{join_table_name}.id"
       else
-        joins_line = "INNER JOIN #{join_table_name} ON #{joined_model.table_name}.id = #{join_table_name}.#{foreign_key}"
+        joins_line = "#{join_type} #{join_table_name} ON #{joined_model.table_name}.id = #{join_table_name}.#{foreign_key}"
       end
 
       if self.joins_line
@@ -97,7 +105,7 @@ module ReactiveRecord
       end
 
       self.joined_models << join_class_name.constantize
-      source_association ? self.joins(source_association) : self
+      source_association ? self.base_joins(source_association, join_type) : self
     end
 
     def where(params, *args)
