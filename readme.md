@@ -156,9 +156,21 @@ Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 **Hash Conditions**
 
 ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them:
+
+*Equality Conditions*
 ```
 Person.where(last_name: 'Stark')
 Person.where(last_name: 'Stark', first_name: 'Arya')
+```
+
+*Range Conditions*
+```
+Person.where(first_name: ('Arya'..'Jon'))
+```
+
+*Subset Conditions*
+```
+Person.where(first_name: ['Robert', 'Stannis', 'Renly'])
 ```
 
 ## Ordering
