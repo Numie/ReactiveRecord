@@ -1,7 +1,5 @@
 # README
 
-ReactiveRecord is a custom-built version of ActiveRecord.
-
 ## Setup Instructions
 
 1. Clone the repo.
@@ -53,6 +51,29 @@ class Region < ReactiveRecord::Base
 end
 ```
 
+## Understanding Method Chaining
+
+The ReactiveRecord pattern implements Method Chaining, which allows you to use multiple ReactiveRecord methods together.
+
+You can chain methods in a statement when the previous method called returns a ReactiveRecord::Relation object, like `all`, `where`, and `joins`. Methods that return a single object (see Retrieving a Single Object Section) have to be at the end of the statement.
+
+When a ReactiveRecord method is called, the query is *not immediately generated*. A query only hits the database when the data is actually needed. You may also force a ReactiveRecord::Relation to query the database by calling `execute` on it.
+
+Find people with 3 pets:
+```
+mother_of_dragons = Person.select('people.first_name, people.last_name, COUNT(*) as pet_count').joins(:pets).group(:last_name).having(pet_count: 3)
+
+mother_of_dragons.class
+>> ReactiveRecord::Relation
+```
+The query returns a ReactiveRecord::Relation and does not hit the database because the data is not yet needed.
+```
+mother_of_dragons.execute
+>> [{"first_name"=>"Daenerys", "last_name"=>"Targaryen", "pet_count"=>3}]
+```
+Now the query is executed.
+
+
 ## Retrieving Objects from the Database
 
 To retrieve objects from the database, ReactiveRecord provides several finder methods. Each finder method allows you to pass arguments into it to perform certain queries on your database without writing raw SQL.
@@ -60,7 +81,7 @@ To retrieve objects from the database, ReactiveRecord provides several finder me
 Methods that find a single entity, such as `find` and `first`, return a single instance of the model. Methods that return a collection, such as `where` and `group`, return an instance of `ReactiveRecord::Relation`.
 
 ### ::all
-See a list of the regions of Westeros.
+See a list of the regions of Westeros. Returns a ReactiveRecord::Relation.
 ```
 Region.all
 ```
