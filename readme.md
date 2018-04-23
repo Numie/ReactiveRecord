@@ -157,9 +157,8 @@ Person.where('last_name = ? AND first_name = ?', 'Stark', 'Arya')
 
 ReactiveRecord also allows you to pass in hash conditions with keys of the fields you want qualified and the values of how you want to qualify them.
 
-\*Only equality, range and subset checking are possible with Hash conditions.
-
 *Equality Conditions*
+
 ```
 Person.where(last_name: 'Stark', first_name: 'Arya')
 ```
@@ -171,6 +170,7 @@ WHERE last_name = 'Stark' AND first_name = 'Arya'
 ```
 
 *Range Conditions*
+
 To find records using the `BETWEEN` expression, pass a range to the conditions hash:
 ```
 Person.where(first_name: ('Arya'..'Jon'))
@@ -183,6 +183,7 @@ WHERE first_name BETWEEN 'Arya' AND 'Jon'
 ```
 
 *Subset Conditions*
+
 To find records using the `IN` expression, pass an array to the conditions hash:
 ```
 Person.where(first_name: ['Robert', 'Stannis', 'Renly'])
