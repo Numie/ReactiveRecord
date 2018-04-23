@@ -162,7 +162,7 @@ WHERE id = ?
       self.id ? self.update : self.insert
     end
 
-    def delete
+    def destroy
       id = self.id
 
       DBConnection.execute(<<-SQL, id)

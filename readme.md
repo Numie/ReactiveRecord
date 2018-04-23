@@ -305,7 +305,7 @@ INNER JOIN regions ON houses.region_id = regions.id
 
 ## ::left_outer_joins
 ```
-Person.joins(:pets)
+Person.left_outer_joins(:pets)
 ```
 This produces:
 ```
@@ -351,11 +351,11 @@ Person.find(25).house
 ### #save
 Use 'save' in lieu of either 'insert' or 'update'.
 
-### #delete
+### #destroy
 Delete Walder Frey.
 ```
 walder = Person.find_by(first_name: 'Walder')
-walder.delete
+walder.destroy
 
 Person.find_by(first_name: 'Walder')
 ```
