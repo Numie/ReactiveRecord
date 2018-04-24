@@ -1,3 +1,5 @@
+require_relative 'errors'
+
 module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
@@ -130,7 +132,8 @@ module ReactiveRecord
       source_association ? self.base_joins(source_association, join_type) : self
     end
 
-    def where(params, *args)
+    def where(params=nil, *args)
+      return self unless params
       #create the string of where conditions
       if params.is_a?(Hash)
         vals = []
@@ -160,6 +163,47 @@ module ReactiveRecord
 
       self.where_line ? self.where_line += (" AND " + where_line) : self.where_line = where_line
       self.where_vals ? self.where_vals += vals : self.where_vals = vals
+      self
+    end
+
+    def not(params, *args)
+      #create the string of where conditions
+      if params.is_a?(Hash)
+        vals = []
+        where_line = params.map do |param, val|
+          if val.is_a?(Range)
+            vals += [val.first, val.last]
+            "#{param} NOT BETWEEN ? AND ?"
+          elsif val.is_a?(Array)
+            #create correct number of question marks
+            question_marks = val.map { |c| "?" }.join(", ")
+            vals += val
+            "#{param} NOT IN (#{question_marks})"
+          else
+            vals << val
+            "#{param} != ?"
+          end
+        end.join(" AND ")
+      elsif args
+        where_line = params
+        vals = args
+      elsif params.is_a?(String)
+        where_line = params
+        vals = []
+      else
+        raise 'ReactiveRecord Error'
+      end
+
+      self.where_line ? self.where_line += (" AND " + where_line) : self.where_line = where_line
+      self.where_vals ? self.where_vals += vals : self.where_vals = vals
+      self
+    end
+
+    def or(relation)
+      raise ReactiveRecord::ArgumentError.new("You have passed a #{relation.class} object to #or. Pass a ReactiveRecord::Relation object instead.") unless relation.is_a?(ReactiveRecord::Relation)
+
+      self.where_line += (" OR " + relation.where_line)
+      self.where_vals += relation.where_vals
       self
     end
 

@@ -1,5 +1,6 @@
 require_relative 'db_connection'
 require_relative 'relation'
+require_relative 'errors'
 
 module Searchable
   def find_by_sql(query)
@@ -63,7 +64,12 @@ module Searchable
     source_association ? relation.base_joins(source_association, join_type) : relation
   end
 
-  def where(params, *args)
+  def where(params=nil, *args)
+    unless params
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
+      return relation
+    end
     #create the string of where conditions
     if params.is_a?(Hash)
       vals = []

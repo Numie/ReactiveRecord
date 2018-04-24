@@ -227,6 +227,24 @@ FROM people
 WHERE first_name IN ('Robert', 'Stannis', 'Renly')
 ```
 
+**NOT Conditions**
+
+`NOT` SQL queries can be built by `where.not`:
+```
+Pet.where.not(species: 'Dragon')
+```
+You may also chain `not` after a previous where clause:
+```
+Person.where(last_name: 'Lannister').not(first_name: 'Tyrion')
+```
+
+**OR Conditions**
+
+`OR` conditions between two relations can be built by calling `or` on the first relation, and passing the second one as an argument.
+```
+Person.where(first_name: 'Bran').or(Person.where(first_name: 'Rickon'))
+```
+
 ## Ordering
 
 To retrieve records from the database in a specific order, you can use the `order` method. You can specify `ASC` (default) or `DESC`,  as well as order by multiple fields.
