@@ -115,6 +115,21 @@ FROM #{self.table_name}
       self.parse_all(hash)
     end
 
+    def self.exists?(ids)
+      ids = [ids] if ids.is_a?(Integer)
+      result = []
+      ids.each do |id|
+        hash = DBConnection.execute(<<-SQL, id)
+SELECT *
+FROM #{self.table_name}
+WHERE id = ?
+        SQL
+        return true unless hash.empty?
+      end
+
+      false
+    end
+
     def initialize(params = {})
       params.each do |attr_name, value|
         attr_name = attr_name.to_sym

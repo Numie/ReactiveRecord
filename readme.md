@@ -358,6 +358,17 @@ Find Drogon with your own SQL:
 Pet.find_by_sql("SELECT * FROM pets WHERE name = 'Drogon'")
 ```
 
+## Existence of Objects
+
+If you simply want to check for the existence of the object, use `exists?`. This method will query the database using the same query as `find`, but instead of returning an object or collection of objects it will return either true or false.
+```
+Person.exists?(41)
+>> true
+
+Person.exists?([98, 99])
+>> false
+```
+
 ## Calculations
 
 ReactiveRecord provides a number of methods to make calculations within database queries: `count`, `average`, `minimum`, `maximum` and `sum`.
