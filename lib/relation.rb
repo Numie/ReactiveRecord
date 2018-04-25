@@ -2,8 +2,8 @@ require_relative 'errors'
 
 module ReactiveRecord
   class Relation
-    attr_accessor :model_name, :select_line, :distinct, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
-    :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string
+    attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
+    :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string, :calc
 
     def initialize
     end
@@ -24,7 +24,7 @@ module ReactiveRecord
         default_select_line = (self.group_line || self.joins_line) ? default_selects.join(', ') : '*'
 
         query_lines = [
-          "SELECT #{self.distinct ? 'DISTINCT ' : ''}#{@select_line || default_select_line}",
+          "SELECT #{@distinct ? 'DISTINCT ' : ''}#{@select_line || default_select_line}",
           "FROM #{@from_line}",
           @joins_line ? "#{@joins_line}" : nil,
           @where_line ? "WHERE #{@where_line}" : nil,
@@ -60,7 +60,7 @@ module ReactiveRecord
 #{query_string}
       SQL
 
-      return hashes if self.group_line || self.joins_line
+      return hashes if self.group_line || self.joins_line || self.calc
 
       #create array of objects from each hash
       hashes.map { |hash| self.model_name.new(hash) }
@@ -77,7 +77,7 @@ module ReactiveRecord
     end
 
     def distinct
-      self.distinct = true
+      self.distinct_line = true
       self
     end
 

@@ -1,4 +1,3 @@
-require_relative 'db_connection'
 require_relative 'relation'
 require_relative 'errors'
 
@@ -25,7 +24,7 @@ module Searchable
 
   def distinct
     relation = ReactiveRecord::Relation.new
-    relation.model_name, relation.from_line, relation.joined_models, relation.distinct = self.name.constantize, self.table_name, [self.name.constantize], true
+    relation.model_name, relation.from_line, relation.joined_models, relation.distinct_line = self.name.constantize, self.table_name, [self.name.constantize], true
     relation
   end
 

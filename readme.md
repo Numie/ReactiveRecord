@@ -55,13 +55,17 @@ end
 
 The ReactiveRecord pattern implements Method Chaining, which allows you to use multiple ReactiveRecord methods together.
 
-You can chain methods in a statement when the previous method called returns a ReactiveRecord::Relation object, like `all`, `where`, and `joins`. Methods that return a single object (see Retrieving a Single Object Section) have to be at the end of the statement.
+You can chain methods in a statement when the previous method called returns a ReactiveRecord::Relation object, like `all`, `where`, and `joins`. Methods that return a single object (see Retrieving Objects from the Database Section) have to be at the end of the statement.
 
 When a ReactiveRecord method is called, the query is *not immediately generated*. A query only hits the database when the data is actually needed. You may also force a ReactiveRecord::Relation to query the database by calling `execute` on it.
 
 Find people with 3 pets:
 ```
-mother_of_dragons = Person.select('people.first_name, people.last_name, COUNT(*) as pet_count').joins(:pets).group(:last_name).having(pet_count: 3)
+mother_of_dragons =
+  Person.select('people.first_name, people.last_name, COUNT(*) as pet_count')
+  .joins(:pets)
+  .group(:last_name)
+  .having(pet_count: 3)
 
 mother_of_dragons.class
 >> ReactiveRecord::Relation
@@ -352,6 +356,22 @@ If you'd like to use your own SQL to find records in a table you can use `find_b
 Find Drogon with your own SQL:
 ```
 Pet.find_by_sql("SELECT * FROM pets WHERE name = 'Drogon'")
+```
+
+## Calculations
+
+ReactiveRecord provides a number of methods to make calculations within database queries: `count`, `average`, `minimum`, `maximum` and `sum`.
+
+### ::count
+To see the total number of records in a table, use count:
+```
+House.count
+```
+`count` may also take a column name as an argument, and will return the number of records for which the column is not `NULL`.
+
+The query below will return only the houses that have words, e.g. 'Winter is Coming'.
+```
+House.count(:words)
 ```
 
 ## Make Changes to the Database

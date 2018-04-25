@@ -1,5 +1,6 @@
 require_relative 'db_connection'
 require_relative 'searchable'
+require_relative 'calculatable'
 require_relative 'associatable'
 require_relative 'relation'
 require_relative 'errors'
@@ -8,6 +9,7 @@ require 'active_support/inflector'
 module ReactiveRecord
   class Base
     extend Searchable
+    extend Calculatable
     extend Associatable
 
     def self.columns
