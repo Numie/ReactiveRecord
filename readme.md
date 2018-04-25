@@ -381,6 +381,10 @@ Person.average(:age)
 ```
 
 ### ::minimum
+Find the youngest person in Westeros:
+```
+Person.minimum(:age)
+```
 
 ## Make Changes to the Database
 
