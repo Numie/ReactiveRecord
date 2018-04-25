@@ -368,6 +368,19 @@ Person.exists?(41)
 Person.exists?([98, 99])
 >> false
 ```
+If `exists?` is passes an integer or an array of integers, it will default to checking the table's id column. However, you may also pass `exists?` a Hash in order to check if a record exists in any other column:
+```
+Person.exists?(first_name: 'Asha')
+>> true
+
+Person.exists?(first_name: 'Yara')
+>> false
+```
+`exists?` may also be called on a ReactiveRecord::Relation. Calling `exists?` this way will cause the relation to execute a query.
+```
+Region.where(name: 'The Reach').exists?
+>> true
+```
 
 ## Calculations
 

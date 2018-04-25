@@ -286,6 +286,11 @@ module ReactiveRecord
       self
     end
 
+    def exists?
+      result = self.execute
+      !result.empty?
+    end
+
     def count(col=nil)
       if !col
         val = "*"

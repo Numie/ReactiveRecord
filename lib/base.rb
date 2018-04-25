@@ -120,8 +120,8 @@ FROM #{self.table_name}
         col = vals.keys.first.to_s
         vals = vals.values
       else
-        col = id
-        vals = [ids] if vals.is_a?(Integer)
+        col = 'id'
+        vals = [vals] if vals.is_a?(Integer)
       end
       vals.each do |val|
         hash = DBConnection.execute(<<-SQL, val)
