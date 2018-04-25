@@ -374,6 +374,14 @@ The query below will return only the houses that have words, e.g. 'Winter is Com
 House.count(:words)
 ```
 
+### ::average
+Find the average of all people:
+```
+Person.average(:age)
+```
+
+### ::minimum
+
 ## Make Changes to the Database
 
 ### #insert

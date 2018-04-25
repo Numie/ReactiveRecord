@@ -278,5 +278,35 @@ module ReactiveRecord
       self.offset_line = n
       self
     end
+
+    def count(col=nil)
+      if !col
+        val = "*"
+      elsif col.is_a?(String)
+        val = col
+      elsif col.is_a?(Symbol)
+        val = "#{self.from_line}.#{col.to_s}"
+      else
+        raise ReactiveRecord::ArgumentError.new("You have passed a #{col.class} object to ::count. Pass a String or a Symbol instead.")
+      end
+
+      self.select_line ? self.select_line += ", COUNT(#{val})" : self.select_line = "COUNT(#{val})"
+      self.calc = true
+      self
+    end
+
+    def average(col)
+    if col.is_a?(String)
+      val = col
+    elsif col.is_a?(Symbol)
+      val = "#{self.from_line}.#{col.to_s}"
+    else
+      raise ReactiveRecord::ArgumentError.new("You have passed a #{col.class} object to ::average. Pass a String or a Symbol instead.")
+    end
+
+    self.select_line ? self.select_line += ", AVG(#{val})" : self.select_line = "AVG(#{val})"
+    self.calc = true
+    self
+    end
   end
 end
