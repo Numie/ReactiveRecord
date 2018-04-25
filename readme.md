@@ -381,9 +381,21 @@ Person.average(:age)
 ```
 
 ### ::minimum
-Find the youngest person in Westeros:
+Find the youngest person in Westeros, Rickon:
 ```
-Person.minimum(:age)
+Person.select('*').minimum(:age)
+```
+
+### ::maximum
+Find the oldest person in Westeros, Maester Aemon:
+```
+Person.select('*').maximum(:age)
+```
+
+### ::sum
+Find the sum of the ages of all of the Baratheon/Lannister children:
+```
+Person.where(first_name: ['Joffrey', 'Myrcella', 'Tommen']).sum(:age)
 ```
 
 ## Make Changes to the Database
@@ -440,7 +452,7 @@ eddard.region
 ### Person#pets
 Find Daenerys Targaryen's dragons.
 ```
-dany = Person.find(40)
+dany = Person.find(41)
 dany.pets
 ```
 

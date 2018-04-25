@@ -108,18 +108,19 @@ VALUES
   (37, "Joffrey", "Baratheon", 11, 12),
   (38, "Myrcella", "Baratheon", 7, 12),
   (39, "Tommen", "Baratheon", 6, 12),
-  (40, "Daenerys", "Targaryen", 13, 13),
-  (41, "Viserys", "Targaryen", 21, 13),
-  (42, "Olenna", "Tyrell", 69, 14),
-  (43, "Mace", "Tyrell", 41, 14),
-  (44, "Loras", "Tyrell", 15, 14),
-  (45, "Margaery", "Tyrell", 14, 14),
-  (46, "Randyll", "Tarly", 45, 15),
-  (47, "Samwell", "Tarly", 14, 15),
-  (48, "Doran", "Martell", 49, 16),
-  (49, "Oberyn", "Martell", 40, 16),
-  (50, "Ellaria", "Sand", 26, 16),
-  (51, "Trystane", "Martell", 11, 16);
+  (40, "Aemon", "Targaryen", 99, 13),
+  (41, "Daenerys", "Targaryen", 13, 13),
+  (42, "Viserys", "Targaryen", 21, 13),
+  (43, "Olenna", "Tyrell", 69, 14),
+  (44, "Mace", "Tyrell", 41, 14),
+  (45, "Loras", "Tyrell", 15, 14),
+  (46, "Margaery", "Tyrell", 14, 14),
+  (47, "Randyll", "Tarly", 45, 15),
+  (48, "Samwell", "Tarly", 14, 15),
+  (49, "Doran", "Martell", 49, 16),
+  (50, "Oberyn", "Martell", 40, 16),
+  (51, "Ellaria", "Sand", 26, 16),
+  (52, "Trystane", "Martell", 11, 16);
 
 INSERT INTO
   pets (id, name, species, owner_id)
