@@ -393,7 +393,7 @@ Person.select('*').maximum(:age)
 ```
 
 ### ::sum
-Find the sum of the ages of all of the Baratheon/Lannister children:
+Find the sum of the ages of the Baratheon/Lannister children:
 ```
 Person.where(first_name: ['Joffrey', 'Myrcella', 'Tommen']).sum(:age)
 ```

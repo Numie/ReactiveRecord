@@ -81,6 +81,13 @@ module Searchable
           question_marks = val.map { |c| "?" }.join(", ")
           vals += val
           "#{param} IN (#{question_marks})"
+        elsif val.is_a?(Hash)
+          if val[:>] || val[:<] || val[:>=] || val[:<=]
+            vals << val.values.first
+            "#{param} #{val.keys.first.to_s} ?"
+          else
+            raise ReactiveRecord::ArgumentError.new("You passed a key of #{val.keys.first}. Keys may only be comparison operators like :<")
+          end
         else
           vals << val
           "#{param} = ?"
