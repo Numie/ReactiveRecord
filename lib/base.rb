@@ -115,14 +115,19 @@ FROM #{self.table_name}
       self.parse_all(hash)
     end
 
-    def self.exists?(ids)
-      ids = [ids] if ids.is_a?(Integer)
-      result = []
-      ids.each do |id|
-        hash = DBConnection.execute(<<-SQL, id)
+    def self.exists?(vals)
+      if vals.is_a?(Hash)
+        col = vals.keys.first.to_s
+        vals = vals.values
+      else
+        col = id
+        vals = [ids] if vals.is_a?(Integer)
+      end
+      vals.each do |val|
+        hash = DBConnection.execute(<<-SQL, val)
 SELECT *
 FROM #{self.table_name}
-WHERE id = ?
+WHERE #{col} = ?
         SQL
         return true unless hash.empty?
       end
