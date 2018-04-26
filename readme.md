@@ -373,7 +373,14 @@ Region.pluck(:name)
 
 Region.pluck(:id, :name)
 ```
+Unlike `select` and other `Relation` scopes, `pluck` triggers an immediate query, and thus cannot be chained with any further scopes, although it can work with scopes already constructed earlier:
+```
+Person.pluck(:first_name).limit(1)
+>> NoMethodError: undefined method `limit' for #<Array:0x007fa388944430>
 
+Person.limit(1).pluck(:first_name)
+>> ["Eddard"]
+```
 
 ## Existence of Objects
 

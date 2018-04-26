@@ -107,7 +107,9 @@ WHERE id = ?
     end
 
     def self.pluck(*cols)
-      select_line = cols.map { |col| col.is_a?(String) ? col : col.to_s }.join(', ')
+      return ReactiveRecord::ArgumentError.new("pluck only accepts Symbols as arguments") unless cols.all? { |col| col.is_a?(Symbol) }
+
+      select_line = cols.map { |col| col.to_s }.join(', ')
 
       hashes = DBConnection.execute(<<-SQL)
 SELECT #{select_line}

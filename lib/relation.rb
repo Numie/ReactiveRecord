@@ -76,6 +76,24 @@ module ReactiveRecord
       end
     end
 
+    def pluck(*cols)
+      return ReactiveRecord::ArgumentError.new("pluck only accepts Symbols as arguments") unless cols.all? { |col| col.is_a?(Symbol) }
+      result = self.execute
+      if cols.length == 1
+        result.map { |obj| obj.send(cols.first) }
+      else
+        result_arr = []
+        result.each do |obj|
+          obj_arr = []
+          cols.each do |col|
+            obj_arr << obj.send(col)
+          end
+          result_arr << obj_arr
+        end
+        result_arr
+      end
+    end
+
     def distinct
       self.distinct_line = true
       self
