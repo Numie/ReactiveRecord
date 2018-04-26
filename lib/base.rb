@@ -139,6 +139,21 @@ WHERE #{col} = ?
       false
     end
 
+    def self.includes(*associations)
+      associations.each do |assoc|
+        unless self.assoc_options.keys.include?(assoc) || self.through_options.keys.include?(assoc)
+          raise ReactiveRecord::ArgumentError.new("#{assoc} is not a valid association of #{self.name}")
+        end
+      end
+
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
+
+      relation.included = associations
+
+      relation
+    end
+
     def initialize(params = {})
       @association_cache = {}
 

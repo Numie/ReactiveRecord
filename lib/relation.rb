@@ -2,8 +2,9 @@ require_relative 'errors'
 
 module ReactiveRecord
   class Relation
-    attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models, :where_line, :where_vals,
-    :group_line, :having_line, :having_vals, :order_line, :limit_line, :offset_line, :query_string, :calc
+    attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
+    :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
+    :offset_line, :query_string, :calc, :included
 
     def initialize
     end
