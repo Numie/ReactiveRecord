@@ -106,13 +106,15 @@ WHERE id = ?
       self.where(params).first || raise(ReactiveRecord::RecordNotFound.new("Couldn't find #{self.name}"))
     end
 
-    def self.pluck(col)
-      hash = DBConnection.execute(<<-SQL, col)
-SELECT #{col}
+    def self.pluck(*cols)
+      select_line = cols.map { |col| col.is_a?(String) ? col : col.to_s }.join(', ')
+
+      hashes = DBConnection.execute(<<-SQL)
+SELECT #{select_line}
 FROM #{self.table_name}
       SQL
 
-      self.parse_all(hash)
+      cols.length == 1 ? hashes.map { |hash| hash.values.first } : hashes.map { |hash| hash.values }
     end
 
     def self.exists?(vals)

@@ -358,6 +358,23 @@ Find Drogon with your own SQL:
 Pet.find_by_sql("SELECT * FROM pets WHERE name = 'Drogon'")
 ```
 
+### ::pluck
+`pluck` can be used to query one or more columns from a table of a model. It accepts a list of column names as an argument and returns an array of values of the specified columns.
+
+`pluck` makes it possible to replace code like:
+```
+Region.select(:name).map(&:name)
+
+Region.select(:id, :name).map { |region| [region.id, region.name] }
+```
+with:
+```
+Region.pluck(:name)
+
+Region.pluck(:id, :name)
+```
+
+
 ## Existence of Objects
 
 If you simply want to check for the existence of the object, use `exists?`. This method will query the database using the same query as `find`, but instead of returning an object or collection of objects it will return either true or false.
