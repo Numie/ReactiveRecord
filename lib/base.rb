@@ -140,8 +140,17 @@ WHERE #{col} = ?
     end
 
     def self.includes(*associations)
+      included_table_names = []
       associations.each do |assoc|
-        unless self.assoc_options.keys.include?(assoc) || self.through_options.keys.include?(assoc)
+        if self.assoc_options.keys.include?(assoc)
+          included_table_names << self.assoc_options[assoc].class_name.constantize.table_name
+        elsif self.through_options.keys.include?(assoc)
+          through_assoc = self.through_options[assoc].through_name
+          source_assoc = self.through_options[assoc].source_name
+          model = self.assoc_options[through_assoc].class_name.constantize
+          table = model.assoc_options[source_assoc].class_name.constantize.table_name
+          included_table_names << table
+        else
           raise ReactiveRecord::ArgumentError.new("#{assoc} is not a valid association of #{self.name}")
         end
       end
@@ -149,7 +158,7 @@ WHERE #{col} = ?
       relation = ReactiveRecord::Relation.new
       relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
 
-      relation.included = associations
+      relation.included, relation.included_table_names = associations, included_table_names
 
       relation
     end

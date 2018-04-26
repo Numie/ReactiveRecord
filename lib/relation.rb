@@ -4,7 +4,7 @@ module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
     :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
-    :offset_line, :query_string, :calc, :included
+    :offset_line, :query_string, :calc, :included, :included_table_names
 
     def initialize
     end
@@ -60,6 +60,18 @@ module ReactiveRecord
       hashes = DBConnection.execute(<<-SQL, vals)
 #{query_string}
       SQL
+
+      if self.included
+        ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+
+        included_where_array = ids.map { |id| '?' }
+
+        included_data = DBConnection.execute(<<-SQL, ids)
+SELECT *
+FROM #{self.included_table_names.first}
+WHERE ids IN #{included_where_array}
+        SQL
+      end
 
       return hashes if self.group_line || self.joins_line || self.calc
 
