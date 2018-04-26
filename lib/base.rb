@@ -140,6 +140,8 @@ WHERE #{col} = ?
     end
 
     def initialize(params = {})
+      @association_cache = {}
+
       params.each do |attr_name, value|
         attr_name = attr_name.to_sym
 
