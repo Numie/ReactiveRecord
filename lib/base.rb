@@ -140,12 +140,20 @@ WHERE #{col} = ?
     end
 
     def self.includes(*associations)
-      included_table_names = []
-      included_foreign_keys = []
+      included = {}
+
       associations.each do |assoc|
         if self.assoc_options.keys.include?(assoc)
-          included_table_names << self.assoc_options[assoc].class_name.constantize.table_name
-          included_foreign_keys << self.assoc_options[assoc].foreign_key
+          table_name = self.assoc_options[assoc].class_name.constantize.table_name
+          foreign_key = self.assoc_options[assoc].foreign_key
+          type = self.assoc_options[assoc].type
+
+          assoc_hash = {}
+          assoc_hash[:table_name] = table_name
+          assoc_hash[:foreign_key] = foreign_key
+          assoc_hash[:type] = type
+
+          included[assoc] = assoc_hash
         elsif self.through_options.keys.include?(assoc)
           through_assoc = self.through_options[assoc].through_name
           source_assoc = self.through_options[assoc].source_name
@@ -158,10 +166,7 @@ WHERE #{col} = ?
       end
 
       relation = ReactiveRecord::Relation.new
-      relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
-
-      relation.included, relation.included_table_names, relation.included_foreign_keys = associations, included_table_names, included_foreign_keys
-
+      relation.model_name, relation.from_line, relation.joined_models, relation.included = self.name.constantize, self.table_name, [self.name.constantize], included
       relation
     end
 

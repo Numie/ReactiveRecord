@@ -5,7 +5,7 @@ module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
     :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
-    :offset_line, :query_string, :calc, :included, :included_table_names, :included_foreign_keys
+    :offset_line, :query_string, :calc, :included
 
     def initialize
     end
@@ -72,39 +72,42 @@ module ReactiveRecord
       objects = hashes.map { |hash| self.model_name.new(hash) }
 
       objects.each do |object|
-        object.send(:association_cache)[self.included.first] = included_data
+        object.send(:association_cache)[self.included.keys.first] = included_data
       end
     end
 
     def includes_execute(hashes)
-      incl_table_name = self.included_table_names.first
+      included_data = nil
+      self.included.each do |assoc, data|
+        foreign_key = data[:foreign_key]
+        table_name = data[:table_name]
+        type = data[:type]
 
-      foreign_key = self.included_foreign_keys.first
-      if self.model_name.columns.include?(foreign_key)
-        foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
-      else
-        ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
-      end
+        if type == :belongs_to
+          foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
+        else
+          ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+        end
 
-      vals = ids ? ids : foreign_keys
+        vals = type == :belongs_to ? foreign_keys.uniq : ids.uniq
 
-      included_where_string = vals.map { |val| '?' }.join(', ')
+        included_where_string = vals.map { |val| '?' }.join(', ')
 
-      where_col = ids ? "#{incl_table_name}.#{foreign_key}" : "#{incl_table_name}.id"
+        where_col = type == :belongs_to ? "#{table_name}.id" : "#{table_name}.#{foreign_key}"
 
-      included_data = DBConnection.execute(<<-SQL, vals)
+        included_data = DBConnection.execute(<<-SQL, vals)
 SELECT *
-FROM #{incl_table_name}
+FROM #{table_name}
 WHERE #{where_col} IN (#{included_where_string})
-      SQL
+        SQL
+      end
 
       included_data
     end
 
     def method_missing(method, *args)
-      arr = self.execute
-
-      if arr.respond_to?(method)
+      if Array.method_defined?(method)
+        arr = self.execute
         arr.send(method, *args)
       else
         super
