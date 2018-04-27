@@ -63,22 +63,19 @@ module ReactiveRecord
       SQL
 
       if self.included
-        included_data = self.includes_execute(hashes)
-      end
+        self.includes_execute(hashes)
+      else
+        return hashes if self.group_line || self.joins_line || self.calc
 
-      return hashes if self.group_line || self.joins_line || self.calc
-
-      #create array of objects from each hash
-      objects = hashes.map { |hash| self.model_name.new(hash) }
-
-      if self.included
-        objects.each do |object|
-          object.send(:association_cache)[self.included.keys.first] = included_data
-        end
+        #create array of objects from each hash
+        objects = hashes.map { |hash| self.model_name.new(hash) }
       end
     end
 
     def includes_execute(hashes)
+      #create array of objects from each hash
+      objects = hashes.map { |hash| self.model_name.new(hash) }
+
       included_data = nil
       self.included.each do |assoc, data|
         foreign_key = data[:foreign_key]
@@ -102,9 +99,17 @@ SELECT *
 FROM #{table_name}
 WHERE #{where_col} IN (#{included_where_string})
         SQL
+
+        objects.each do |object|
+          if type == :belongs_to
+            object.send(:association_cache)[assoc] = included_data.select { |hash| hash['id'] == object.send(foreign_key) }
+          else
+            object.send(:association_cache)[assoc] = included_data.select { |hash| hash[foreign_key.to_s] == object.id }
+          end
+        end
       end
 
-      included_data
+      objects
     end
 
     def method_missing(method, *args)
