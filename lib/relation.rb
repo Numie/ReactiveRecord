@@ -4,7 +4,7 @@ module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
     :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
-    :offset_line, :query_string, :calc, :included, :included_table_names
+    :offset_line, :query_string, :calc, :included, :included_table_names, :included_foreign_keys
 
     def initialize
     end
@@ -62,17 +62,28 @@ module ReactiveRecord
       SQL
 
       if self.included
-        ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+        incl_table_name = self.included_table_names.first
 
-        included_where_array = ids.map { |id| '?' }
+        foreign_key = self.included_foreign_keys.first
+        if self.model_name.columns.include?(foreign_key)
+          foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
+        else
+          ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+        end
 
-        included_data = DBConnection.execute(<<-SQL, ids)
+        vals = ids ? ids : foreign_keys
+
+        included_where_string = vals.map { |val| '?' }.join(', ')
+
+        where_col = ids ? "#{incl_table_name}.#{foreign_key}" : "#{incl_table_name}.id"
+
+        included_data = DBConnection.execute(<<-SQL, vals)
 SELECT *
-FROM #{self.included_table_names.first}
-WHERE ids IN #{included_where_array}
+FROM #{incl_table_name}
+WHERE #{where_col} IN (#{included_where_string})
         SQL
       end
-
+      return included_data
       return hashes if self.group_line || self.joins_line || self.calc
 
       #create array of objects from each hash

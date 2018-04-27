@@ -141,9 +141,11 @@ WHERE #{col} = ?
 
     def self.includes(*associations)
       included_table_names = []
+      included_foreign_keys = []
       associations.each do |assoc|
         if self.assoc_options.keys.include?(assoc)
           included_table_names << self.assoc_options[assoc].class_name.constantize.table_name
+          included_foreign_keys << self.assoc_options[assoc].foreign_key
         elsif self.through_options.keys.include?(assoc)
           through_assoc = self.through_options[assoc].through_name
           source_assoc = self.through_options[assoc].source_name
@@ -158,7 +160,7 @@ WHERE #{col} = ?
       relation = ReactiveRecord::Relation.new
       relation.model_name, relation.from_line, relation.joined_models = self.name.constantize, self.table_name, [self.name.constantize]
 
-      relation.included, relation.included_table_names = associations, included_table_names
+      relation.included, relation.included_table_names, relation.included_foreign_keys = associations, included_table_names, included_foreign_keys
 
       relation
     end
