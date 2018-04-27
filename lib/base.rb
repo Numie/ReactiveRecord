@@ -146,11 +146,13 @@ WHERE #{col} = ?
         if self.assoc_options.keys.include?(assoc)
           table_name = self.assoc_options[assoc].class_name.constantize.table_name
           foreign_key = self.assoc_options[assoc].foreign_key
+          model = self.assoc_options[assoc].class_name.constantize
           type = self.assoc_options[assoc].type
 
           assoc_hash = {}
           assoc_hash[:table_name] = table_name
           assoc_hash[:foreign_key] = foreign_key
+          assoc_hash[:model] = model
           assoc_hash[:type] = type
 
           included[assoc] = assoc_hash

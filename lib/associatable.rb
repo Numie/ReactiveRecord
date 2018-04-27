@@ -18,6 +18,9 @@ module Associatable
 
     #create the association method
     define_method(name) do
+      #fetch data from association_cache if it includes was called
+      included_data = self.send(:association_cache)[name]
+      return included_data.first if included_data
 
       options = self.class.assoc_options[name]
 
@@ -39,6 +42,9 @@ module Associatable
 
       #create the association method
       define_method(name) do
+        #fetch data from association_cache if it includes was called
+        included_data = self.send(:association_cache)[name]
+        return included_data if included_data
 
         options = self.class.assoc_options[name]
 

@@ -80,6 +80,7 @@ module ReactiveRecord
       self.included.each do |assoc, data|
         foreign_key = data[:foreign_key]
         table_name = data[:table_name]
+        model = data[:model]
         type = data[:type]
 
         if type == :belongs_to
@@ -94,17 +95,19 @@ module ReactiveRecord
 
         where_col = type == :belongs_to ? "#{table_name}.id" : "#{table_name}.#{foreign_key}"
 
-        included_data = DBConnection.execute(<<-SQL, vals)
+        included_hashes = DBConnection.execute(<<-SQL, vals)
 SELECT *
 FROM #{table_name}
 WHERE #{where_col} IN (#{included_where_string})
         SQL
 
+        included_objects = included_hashes.map { |hash| model.new(hash) }
+
         objects.each do |object|
           if type == :belongs_to
-            object.send(:association_cache)[assoc] = included_data.select { |hash| hash['id'] == object.send(foreign_key) }
+            object.send(:association_cache)[assoc] = included_objects.select { |obj| obj.id == object.send(foreign_key) }
           else
-            object.send(:association_cache)[assoc] = included_data.select { |hash| hash[foreign_key.to_s] == object.id }
+            object.send(:association_cache)[assoc] = included_objects.select { |obj| obj.send(foreign_key) == object.id }
           end
         end
       end
