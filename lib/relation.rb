@@ -1,4 +1,5 @@
 require_relative 'errors'
+require 'byebug'
 
 module ReactiveRecord
   class Relation
@@ -62,32 +63,39 @@ module ReactiveRecord
       SQL
 
       if self.included
-        incl_table_name = self.included_table_names.first
-
-        foreign_key = self.included_foreign_keys.first
-        if self.model_name.columns.include?(foreign_key)
-          foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
-        else
-          ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
-        end
-
-        vals = ids ? ids : foreign_keys
-
-        included_where_string = vals.map { |val| '?' }.join(', ')
-
-        where_col = ids ? "#{incl_table_name}.#{foreign_key}" : "#{incl_table_name}.id"
-
-        included_data = DBConnection.execute(<<-SQL, vals)
-SELECT *
-FROM #{incl_table_name}
-WHERE #{where_col} IN (#{included_where_string})
-        SQL
+        included_data = self.includes_execute(hashes)
+        return included_data
       end
-      return included_data
+
       return hashes if self.group_line || self.joins_line || self.calc
 
       #create array of objects from each hash
       hashes.map { |hash| self.model_name.new(hash) }
+    end
+
+    def includes_execute(hashes)
+      incl_table_name = self.included_table_names.first
+
+      foreign_key = self.included_foreign_keys.first
+      if self.model_name.columns.include?(foreign_key)
+        foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
+      else
+        ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+      end
+
+      vals = ids ? ids : foreign_keys
+
+      included_where_string = vals.map { |val| '?' }.join(', ')
+
+      where_col = ids ? "#{incl_table_name}.#{foreign_key}" : "#{incl_table_name}.id"
+
+      included_data = DBConnection.execute(<<-SQL, vals)
+SELECT *
+FROM #{incl_table_name}
+WHERE #{where_col} IN (#{included_where_string})
+      SQL
+
+      included_data
     end
 
     def method_missing(method, *args)
