@@ -66,7 +66,6 @@ module ReactiveRecord
         self.includes_execute(hashes)
       else
         return hashes if self.group_line || self.joins_line || self.calc
-
         #create array of objects from each hash
         objects = hashes.map { |hash| self.model_name.new(hash) }
       end
@@ -76,7 +75,6 @@ module ReactiveRecord
       #create array of objects from each hash
       objects = hashes.map { |hash| self.model_name.new(hash) }
 
-      included_data = nil
       self.included.each do |assoc, data|
         foreign_key = data[:foreign_key]
         table_name = data[:table_name]
@@ -90,9 +88,7 @@ module ReactiveRecord
         end
 
         vals = type == :belongs_to ? foreign_keys.uniq : ids.uniq
-
         included_where_string = vals.map { |val| '?' }.join(', ')
-
         where_col = type == :belongs_to ? "#{table_name}.id" : "#{table_name}.#{foreign_key}"
 
         included_hashes = DBConnection.execute(<<-SQL, vals)
@@ -115,10 +111,10 @@ WHERE #{where_col} IN (#{included_where_string})
       objects
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *args, &block)
       if Array.method_defined?(method)
         arr = self.execute
-        arr.send(method, *args)
+        arr.send(method, *args, &block)
       else
         super
       end
