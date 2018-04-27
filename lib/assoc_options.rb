@@ -1,7 +1,7 @@
 require 'active_support/inflector'
 
 class AssocOptions
-  attr_accessor :foreign_key, :class_name, :primary_key, :through_name, :source_name
+  attr_accessor :type, :foreign_key, :class_name, :primary_key, :through_name, :source_name
 
   def model_class
     self.class_name.constantize
@@ -18,6 +18,7 @@ class BelongsToOptions < AssocOptions
 
     #set defaults if values are not present
     defaults = {
+      :type => :belongs_to,
       :class_name => name.to_s.capitalize.singularize.camelcase,
       :primary_key => :id,
       :foreign_key => "#{name.to_s.singularize.underscore}_id".to_sym
@@ -35,6 +36,7 @@ class HasManyOptions < AssocOptions
 
     #set defaults if values are not present
     defaults = {
+      :type => :has_many,
       :class_name => name.to_s.capitalize.singularize.camelcase,
       :primary_key => :id,
       :foreign_key => "#{self_class_name.to_s.singularize.underscore}_id".to_sym

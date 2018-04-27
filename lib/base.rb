@@ -224,5 +224,9 @@ DELETE FROM #{self.class.table_name}
 WHERE id = ?
       SQL
     end
+
+    private
+
+    attr_reader :association_cache
   end
 end

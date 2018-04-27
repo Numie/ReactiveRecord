@@ -64,13 +64,16 @@ module ReactiveRecord
 
       if self.included
         included_data = self.includes_execute(hashes)
-        return included_data
       end
 
       return hashes if self.group_line || self.joins_line || self.calc
 
       #create array of objects from each hash
-      hashes.map { |hash| self.model_name.new(hash) }
+      objects = hashes.map { |hash| self.model_name.new(hash) }
+
+      objects.each do |object|
+        object.send(:association_cache)[self.included.first] = included_data
+      end
     end
 
     def includes_execute(hashes)
