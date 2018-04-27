@@ -71,8 +71,10 @@ module ReactiveRecord
       #create array of objects from each hash
       objects = hashes.map { |hash| self.model_name.new(hash) }
 
-      objects.each do |object|
-        object.send(:association_cache)[self.included.keys.first] = included_data
+      if self.included
+        objects.each do |object|
+          object.send(:association_cache)[self.included.keys.first] = included_data
+        end
       end
     end
 
