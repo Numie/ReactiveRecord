@@ -5,6 +5,7 @@ require_relative 'associatable'
 require_relative 'relation'
 require_relative 'errors'
 require 'active_support/inflector'
+require 'byebug'
 
 module ReactiveRecord
   class Base
@@ -144,24 +145,16 @@ WHERE #{col} = ?
 
       associations.each do |assoc|
         if self.assoc_options.keys.include?(assoc)
-          table_name = self.assoc_options[assoc].class_name.constantize.table_name
-          foreign_key = self.assoc_options[assoc].foreign_key
-          model = self.assoc_options[assoc].class_name.constantize
-          type = self.assoc_options[assoc].type
-
-          assoc_hash = {}
-          assoc_hash[:table_name] = table_name
-          assoc_hash[:foreign_key] = foreign_key
-          assoc_hash[:model] = model
-          assoc_hash[:type] = type
-
-          included[assoc] = assoc_hash
+          included[assoc] = self.association_hash(assoc, self.name.constantize)
         elsif self.through_options.keys.include?(assoc)
           through_assoc = self.through_options[assoc].through_name
+          through_model = self.assoc_options[through_assoc].class_name.constantize
+
           source_assoc = self.through_options[assoc].source_name
-          model = self.assoc_options[through_assoc].class_name.constantize
-          table = model.assoc_options[source_assoc].class_name.constantize.table_name
-          included_table_names << table
+          source_model = through_model.assoc_options[source_assoc].class_name.constantize
+
+          included[through_assoc] = self.association_hash(through_assoc, self.name.constantize)
+          included[source_assoc] = self.association_hash(source_assoc, through_model)
         else
           raise ReactiveRecord::ArgumentError.new("#{assoc} is not a valid association of #{self.name}")
         end
@@ -170,6 +163,21 @@ WHERE #{col} = ?
       relation = ReactiveRecord::Relation.new
       relation.model_name, relation.from_line, relation.joined_models, relation.included = self.name.constantize, self.table_name, [self.name.constantize], included
       relation
+    end
+
+    def self.association_hash(assoc, model)
+      table_name = model.assoc_options[assoc].class_name.constantize.table_name
+      foreign_key = model.assoc_options[assoc].foreign_key
+      model_name = model.assoc_options[assoc].class_name.constantize
+      type = model.assoc_options[assoc].type
+
+      assoc_hash = {}
+      assoc_hash[:table_name] = table_name
+      assoc_hash[:foreign_key] = foreign_key
+      assoc_hash[:model] = model_name
+      assoc_hash[:type] = type
+
+      assoc_hash
     end
 
     def initialize(params = {})
