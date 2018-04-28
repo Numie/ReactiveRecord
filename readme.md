@@ -336,7 +336,7 @@ INNER JOIN houses ON people.house_id = houses.id
 INNER JOIN regions ON houses.region_id = regions.id
 ```
 
-## ::left_outer_joins
+### ::left_outer_joins
 ```
 Person.left_outer_joins(:pets)
 ```
@@ -347,6 +347,47 @@ FROM people
 LEFT OUTER JOIN pets ON people.id = pets.owner_id
 ```
 All people and pets will be returned, even if a person does not own any pets.
+
+## Eager Loading Associations
+
+ReactiveRecord allows you to solve the "N + 1 Queries Problem" with `includes`.
+
+**N + 1 Queries Problem**
+
+Consider the following code, which finds 5 pets and prints their owners:
+```
+pets = Pet.limit(5)
+
+pets.each do |pet|
+  puts pet.owner.first_name
+end
+```
+This code looks fine at first sight, but too many queries are executed. The above code executes 1 (to find 5 pets) + 5 (one per each pet to load the owner) = **6** queries in total.
+
+**Solution to the N + 1 Queries Problem**
+
+ReactiveRecord lets you specify in advance all the associations that are going to be loaded using `includes`. With `includes`, ReactiveRecord ensures that all of the specified associations are loaded using the minimum possible number of queries.
+
+Revisiting the above case, we could rewrite `Pet.limit(5)` to eager load owners:
+```
+pets = Pet.includes(:owner).limit(5)
+
+pets.each do |pet|
+  puts pet.owner.first_name
+end
+```
+The above code will execute just **2** queries, as opposed to **6** queries in the previous case:
+```
+SELECT * FROM pets LIMIT 5
+SELECT * FROM people WHERE people.id IN (3, 4, 5, 6, 7)
+```
+
+### Eager Loading Multiple Associations
+
+This will load the house and all of the pets of each person:
+```
+Person.includes(:house, :pets)
+```
 
 ## Finding By SQL
 
