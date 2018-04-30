@@ -5,7 +5,6 @@ require_relative 'associatable'
 require_relative 'relation'
 require_relative 'errors'
 require 'active_support/inflector'
-require 'byebug'
 
 module ReactiveRecord
   class Base

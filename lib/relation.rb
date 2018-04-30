@@ -11,8 +11,6 @@ module ReactiveRecord
     end
 
     def execute
-      # default_select_line = self.joined_models.map { |model| "#{model.table_name}.*" }.join(', ')
-
       if !self.query_string
         default_selects = []
         self.joined_models.each do |model|
@@ -44,8 +42,6 @@ module ReactiveRecord
 
         self.query_string = constructed_query_string.chomp
       end
-
-      # query_string = self.query_string || constructed_query_string.chomp
 
       where_vals = self.where_vals
       having_vals = self.having_vals
@@ -82,9 +78,9 @@ module ReactiveRecord
         type = data[:type]
 
         if type == :belongs_to
-          foreign_keys = hashes.map { |hash| hash["#{self.model_name.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
+          foreign_keys = hashes.map { |hash| hash["#{model.name.downcase}.#{foreign_key.to_s}"] || hash["#{foreign_key.to_s}"] }
         else
-          ids = hashes.map { |hash| hash["#{self.model_name.name.downcase}_id"] || hash["id"] }
+          ids = hashes.map { |hash| hash["#{model.name.downcase}_id"] || hash["id"] }
         end
 
         vals = type == :belongs_to ? foreign_keys.uniq : ids.uniq
@@ -97,11 +93,23 @@ FROM #{table_name}
 WHERE #{where_col} IN (#{included_where_string})
         SQL
 
+        hashes = included_hashes
         included_objects = included_hashes.map { |hash| model.new(hash) }
 
         objects.each do |object|
           if type == :belongs_to
-            object.send(:association_cache)[assoc] = included_objects.select { |obj| obj.id == object.send(foreign_key) }
+            if object.respond_to?(foreign_key)
+              object.send(:association_cache)[assoc] = included_objects.select { |obj| obj.id == object.send(foreign_key) }
+            else
+              matched_objects = []
+              object.send(:association_cache).each do |cached_assoc_name, cached_asoc_vals|
+                if cached_asoc_vals.first && cached_asoc_vals.first.respond_to?(foreign_key)
+                  cached_foreign_keys = cached_asoc_vals.map { |cached_obj| cached_obj.send(foreign_key) }
+                  matched_objects = included_objects.select { |obj| cached_foreign_keys.include?(obj.id) }
+                end
+              end
+              object.send(:association_cache)[assoc] = matched_objects
+            end
           else
             object.send(:association_cache)[assoc] = included_objects.select { |obj| obj.send(foreign_key) == object.id }
           end
