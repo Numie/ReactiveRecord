@@ -179,6 +179,12 @@ WHERE #{col} = ?
       assoc_hash
     end
 
+    def self.none
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.null_relation = self.name.constantize, self.table_name, true
+      relation
+    end
+
     def initialize(params = {})
       @association_cache = {}
 

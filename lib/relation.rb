@@ -5,12 +5,13 @@ module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
     :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
-    :offset_line, :query_string, :calc, :included
+    :offset_line, :query_string, :calc, :included, :null_relation
 
     def initialize
     end
 
     def execute
+      return [] if self.null_relation
       if !self.query_string
         default_selects = []
         self.joined_models.each do |model|
@@ -147,15 +148,18 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def distinct
+      return if self.null_relation
       self.distinct_line = true
       self
     end
 
     def joins(association)
+      return if self.null_relation
       self.base_joins(association, "INNER JOIN")
     end
 
     def left_outer_joins(association)
+      return if self.null_relation
       self.base_joins(association, "LEFT OUTER JOIN")
     end
 
@@ -203,6 +207,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def where(params=nil, *args)
+      return if self.null_relation
       return self unless params
       #create the string of where conditions
       if params.is_a?(Hash)
@@ -244,6 +249,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def not(params, *args)
+      return if self.null_relation
       #create the string of where conditions
       if params.is_a?(Hash)
         vals = []
@@ -277,6 +283,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def or(relation)
+      return if self.null_relation
       raise ReactiveRecord::ArgumentError.new("You have passed a #{relation.class} object to #or. Pass a ReactiveRecord::Relation object instead.") unless relation.is_a?(ReactiveRecord::Relation)
 
       self.where_line += (" OR " + relation.where_line)
@@ -285,6 +292,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def group(col)
+      return if self.null_relation
       if col.is_a?(String)
         group_line = col
       else
@@ -296,6 +304,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def having(params, *args)
+      return if self.null_relation
       #create the string of having conditions
       if params.is_a?(Hash)
         vals = []
@@ -329,6 +338,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def order(*cols)
+      return if self.null_relation
       if cols.is_a?(String)
         order_by_line = cols
       else
@@ -347,11 +357,13 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def limit(n)
+      return if self.null_relation
       self.limit_line = n
       self
     end
 
     def offset(n)
+      return if self.null_relation
       self.offset_line = n
       self
     end
@@ -362,6 +374,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def count(col=nil)
+      return if self.null_relation
       if !col
         val = "*"
       elsif col.is_a?(String)
@@ -378,6 +391,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def average(col)
+      return if self.null_relation
       if col.is_a?(String)
         val = col
       elsif col.is_a?(Symbol)
@@ -392,6 +406,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def minimum(col)
+      return if self.null_relation
       if col.is_a?(String)
         val = col
       elsif col.is_a?(Symbol)
@@ -406,6 +421,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def maximum(col)
+      return if self.null_relation
       if col.is_a?(String)
         val = col
       elsif col.is_a?(Symbol)
@@ -420,6 +436,7 @@ WHERE #{where_col} IN (#{included_where_string})
     end
 
     def sum(col)
+      return if self.null_relation
       if col.is_a?(String)
         val = col
       elsif col.is_a?(Symbol)

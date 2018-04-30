@@ -307,6 +307,16 @@ The `having` method can also except equality, range and subset conditions as a h
 Person.select('last_name, COUNT(*) AS count').group(:last_name).having(count: (3..6))
 ```
 
+## Null Relation
+
+The `none` method returns a chainable ReactiveRecord::Relation with no records. Any subsequent conditions chained to the returned relation will continue generating empty relations. This is useful in scenarios where you need a chainable response to a method or a scope that could return zero results.
+```
+null = House.none
+null.class
+>> ReactiveRecord::Relation
+```
+The above code returns an empty relation and fires no queries. If a null relation is forcibly executed, the database will not be queried and an empty array will be returned.
+
 ## Joining Tables
 
 ReactiveRecord lets you use the associations defined on a model as a shortcut for specifying `JOIN` clauses for those associations with the `joins` and `left_outer_joins` methods.
