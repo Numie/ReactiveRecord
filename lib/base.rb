@@ -3,6 +3,7 @@ require_relative 'searchable'
 require_relative 'calculatable'
 require_relative 'associatable'
 require_relative 'relation'
+require_relative 'validatable'
 require_relative 'errors'
 require 'active_support/inflector'
 
@@ -11,6 +12,7 @@ module ReactiveRecord
     extend Searchable
     extend Calculatable
     extend Associatable
+    extend Validatable
 
     def self.columns
       return @columns if @columns
@@ -199,15 +201,23 @@ WHERE #{col} = ?
     def initialize(params = {})
       @association_cache = {}
 
+      columns = self.class.columns
       params.each do |attr_name, value|
         attr_name = attr_name.to_sym
 
-        if self.class.columns.include?(attr_name)
+        if columns.include?(attr_name)
           self.send("#{attr_name}=", value)
         else
           raise "unknown attribute '#{attr_name}'"
         end
       end
+
+      columns.each do |col|
+        unless self.attributes[col]
+          self.send("#{col}=", nil)
+        end
+      end
+
     end
 
     def attributes
