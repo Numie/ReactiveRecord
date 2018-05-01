@@ -207,7 +207,13 @@ WHERE #{col} = ?
       self.class.columns.map { |col| self.attributes[col] }
     end
 
+    def readonly
+      @is_readonly = true
+      self
+    end
+
     def insert
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
       #return all columns except id
       col_names = self.class.columns[1..-1].join(", ")
 
@@ -223,6 +229,7 @@ VALUES (#{question_marks})
     end
 
     def update
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
       set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
 
       DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
@@ -233,10 +240,12 @@ WHERE id = ?
     end
 
     def save
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
       self.id ? self.update : self.insert
     end
 
     def destroy
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
       id = self.id
 
       DBConnection.execute(<<-SQL, id)
@@ -248,5 +257,6 @@ WHERE id = ?
     private
 
     attr_reader :association_cache
+    attr_accessor :is_readonly
   end
 end

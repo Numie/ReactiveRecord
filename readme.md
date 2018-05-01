@@ -317,6 +317,16 @@ null.class
 ```
 The above code returns an empty relation and fires no queries. If a null relation is forcibly executed, the database will not be queried and an empty array will be returned.
 
+## Readonly Objects
+
+ReactiveRecord provides the `readonly` method on an object to explicitly disallow modification of it. Any attempt to alter a readonly record will not succeed, raising an ReactiveRecord::ReadOnlyRecord error.
+```
+eddard = Person.first
+eddard.first_name = 'Ned'
+eddard.save
+>> ReactiveRecord::ReadOnlyRecord: Person is marked as readonly
+```
+
 ## Joining Tables
 
 ReactiveRecord lets you use the associations defined on a model as a shortcut for specifying `JOIN` clauses for those associations with the `joins` and `left_outer_joins` methods.
