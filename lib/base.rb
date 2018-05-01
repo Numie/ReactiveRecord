@@ -191,6 +191,11 @@ WHERE #{col} = ?
       relation
     end
 
+    def self.create(params)
+      object = self.new(params)
+      object.insert
+    end
+
     def initialize(params = {})
       @association_cache = {}
 
