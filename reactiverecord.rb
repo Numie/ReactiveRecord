@@ -1,6 +1,8 @@
 require_relative 'lib/base'
 
 class Person < ReactiveRecord::Base
+  validates :first_name, presence: true
+
   belongs_to :house
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
