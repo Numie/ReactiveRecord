@@ -326,6 +326,7 @@ eddard.first_name = 'Ned'
 eddard.save
 >> ReactiveRecord::ReadOnlyRecord: Person is marked as readonly
 ```
+`readonly` may also be called on a relation, rendering each object returned by the relation readonly.
 
 ## Joining Tables
 

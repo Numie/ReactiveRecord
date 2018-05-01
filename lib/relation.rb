@@ -5,7 +5,7 @@ module ReactiveRecord
   class Relation
     attr_accessor :model_name, :select_line, :distinct_line, :from_line, :joins_line, :joined_models,
     :where_line, :where_vals, :group_line, :having_line, :having_vals, :order_line, :limit_line,
-    :offset_line, :query_string, :calc, :included, :null_relation
+    :offset_line, :query_string, :calc, :included, :null_relation, :is_readonly
 
     def initialize
     end
@@ -65,6 +65,9 @@ module ReactiveRecord
         return hashes if self.group_line || self.joins_line || self.calc
         #create array of objects from each hash
         objects = hashes.map { |hash| self.model_name.new(hash) }
+        if self.is_readonly
+          objects.each { |obj| obj.readonly }
+        end
       end
     end
 
@@ -448,6 +451,10 @@ WHERE #{where_col} IN (#{included_where_string})
       self.select_line ? self.select_line += ", SUM(#{val})" : self.select_line = "SUM(#{val})"
       self.calc = true
       self
+    end
+
+    def readonly
+      self.is_readonly = true
     end
   end
 end

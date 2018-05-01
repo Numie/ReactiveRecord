@@ -185,6 +185,12 @@ WHERE #{col} = ?
       relation
     end
 
+    def self.readonly
+      relation = ReactiveRecord::Relation.new
+      relation.model_name, relation.from_line, relation.joined_models, relation.is_readonly = self.name.constantize, self.table_name, [self.name.constantize], true
+      relation
+    end
+
     def initialize(params = {})
       @association_cache = {}
 
