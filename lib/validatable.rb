@@ -53,7 +53,7 @@ module Validatable
   end
 
   def numericality(val, column, options)
-    message = "#{column} must be an integer"
+    message = "#{column} must be a number"
     if options.is_a?(Hash)
       message = options[:message] || message
     end

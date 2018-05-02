@@ -195,8 +195,13 @@ WHERE #{col} = ?
 
     def self.create(params)
       object = self.new(params)
-      object.perform_validations
       object.insert
+    end
+
+    def self.create!(params)
+      object = self.new(params)
+      object.perform_validations
+      object.insert!
     end
 
     def initialize(params = {})
@@ -237,6 +242,29 @@ WHERE #{col} = ?
     def insert
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
 
+      begin
+        self.perform_validations
+      rescue ReactiveRecord::RecordInvalid
+        return false
+      end
+
+      #return all columns except id
+      col_names = self.class.columns[1..-1].join(", ")
+
+      #create correct number of question marks
+      question_marks = col_names.split(", ").map { |c| "?" }.join(", ")
+
+      DBConnection.execute(<<-SQL, *attribute_values[1..-1])
+INSERT INTO #{self.class.table_name} (#{col_names})
+VALUES (#{question_marks})
+      SQL
+
+      self.id = DBConnection.last_insert_row_id
+    end
+
+    def insert!
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+
       self.perform_validations
 
       #return all columns except id
@@ -256,6 +284,24 @@ VALUES (#{question_marks})
     def update
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
 
+      begin
+        self.perform_validations
+      rescue ReactiveRecord::RecordInvalid
+        return false
+      end
+
+      set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
+
+      DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
+UPDATE #{self.class.table_name}
+SET #{set_line}
+WHERE id = ?
+      SQL
+    end
+
+    def update!
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+
       self.perform_validations
 
       set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
@@ -269,8 +315,12 @@ WHERE id = ?
 
     def save
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
-      self.perform_validations
       self.id ? self.update : self.insert
+    end
+
+    def save!
+      raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+      self.id ? self.update! : self.insert!
     end
 
     def destroy
