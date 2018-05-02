@@ -57,7 +57,11 @@ module Validatable
     if options.is_a?(Hash)
       default_message = options[:message]
       message = default_message || message
-      @errors << message unless val.is_a?(Integer) || val.is?(Float)
+
+      unless val.is_a?(Integer) || val.is_a?(Float)
+        @errors << message
+        return
+      end
 
       options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) }
     end
