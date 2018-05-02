@@ -55,8 +55,18 @@ module Validatable
   def numericality(val, column, options)
     message = "#{column} must be a number"
     if options.is_a?(Hash)
-      message = options[:message] || message
+      default_message = options[:message]
+      message = default_message || message
+      @errors << message unless val.is_a?(Integer) || val.is?(Float)
+
+      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) }
     end
-    @errors << message unless val.is_a?(Integer)
+  end
+
+  private
+
+  def greater_than(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be greater than #{target_val}"
+    @errors << message unless input_val > target_val
   end
 end
