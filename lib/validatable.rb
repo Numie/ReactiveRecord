@@ -104,6 +104,14 @@ module Validatable
     end
   end
 
+  def length(val, column, options)
+    if options.is_a?(Hash)
+      return if options[:allow_nil]
+      default_message = options[:message]
+      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message }
+    end
+  end
+
   private
 
   def only_integer(input_val, target_val, column, default_message)
@@ -161,5 +169,20 @@ module Validatable
 
   def in(input_val, array, message)
     @errors << message unless array.include?(input_val)
+  end
+
+  def minimum(input_val, target_val, column, default_message)
+    message = default_message || "#{column} length must be at least #{target_val}"
+    @errors << message if input_val.length < target_val
+  end
+
+  def maximum(input_val, target_val, column, default_message)
+    message = default_message || "#{column} length must be at most #{target_val}"
+    @errors << message if input_val.length > target_val
+  end
+
+  def is(input_val, target_val, column, default_message)
+    message = default_message || "#{column} length must be #{target_val}"
+    @errors << message if input_val.length != target_val
   end
 end

@@ -25,7 +25,7 @@ end
 
 class House < ReactiveRecord::Base
   validates :name, :seat, :sigil, presence: true, uniqueness: true
-  validates :words, uniqueness: { allow_nil: true }
+  validates :words, uniqueness: { allow_nil: true }, length: { minimum: 2 }
 
   belongs_to :region
   has_many :people, class_name: 'Person'
