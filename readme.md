@@ -513,10 +513,18 @@ Person.where(first_name: ['Joffrey', 'Myrcella', 'Tommen']).sum(:age)
 ### #insert
 Insert Lancel Lannister.
 ```
-lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', house_id: 10)
+lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', age: 16, house_id: 10)
 lancel.insert
 
 Person.find_by(first_name: 'Lancel')
+```
+
+### #create
+Initialize and insert a record into the database with a single method call:
+```
+Person.create(first_name: 'Kevan', last_name: 'Lannister', age: 52, house_id: 10)
+
+Person.find_by(first_name: 'Kevan')
 ```
 
 ### #update
