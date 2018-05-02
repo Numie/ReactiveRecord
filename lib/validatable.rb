@@ -35,7 +35,7 @@ module Validatable
     self.class.validations.each do |column, validations|
       validations.each do |validation, options|
         val = self.send(column)
-        self.send(validation, val, column)
+        self.send(validation, val, column, options)
       end
     end
 
@@ -44,11 +44,19 @@ module Validatable
     end
   end
 
-  def presence(val, column)
-    @errors << "#{column} must exist" if val.blank?
+  def presence(val, column, options)
+    message = "#{column} must exist"
+    if options.is_a?(Hash)
+      message = options[:message] || message
+    end
+    @errors << message if val.blank?
   end
 
-  def numericality(val, column)
-    @errors << "#{column} must be an integer" unless val.is_a?(Integer)
+  def numericality(val, column, options)
+    message = "#{column} must be an integer"
+    if options.is_a?(Hash)
+      message = options[:message] || message
+    end
+    @errors << message unless val.is_a?(Integer)
   end
 end
