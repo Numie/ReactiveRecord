@@ -1,3 +1,4 @@
+require_relative 'base'
 require_relative 'errors'
 require 'active_support'
 require 'active_support/core_ext'
@@ -67,6 +68,15 @@ module Validatable
 
       options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) }
     end
+  end
+
+  def uniqueness(val, column, options)
+    message = "#{column} has already been taken"
+    if options.is_a?(Hash)
+      message = options[:message] || message
+    end
+
+    @errors << message if self.class.exists?({ column => val })
   end
 
   private

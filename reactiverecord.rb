@@ -13,6 +13,9 @@ class Person < ReactiveRecord::Base
 end
 
 class Pet < ReactiveRecord::Base
+  validates :name, presence: true, uniqueness: true
+  validates :species, presence: true
+
   belongs_to :owner, class_name: 'Person'
   has_one_through :house, :owner, :house
   has_one_through :region, :house, :region
