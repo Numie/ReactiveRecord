@@ -12,7 +12,7 @@ module ReactiveRecord
     extend Searchable
     extend Calculatable
     extend Associatable
-    extend Validatable
+    include Validatable
 
     def self.columns
       return @columns if @columns
