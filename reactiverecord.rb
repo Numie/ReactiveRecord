@@ -3,7 +3,7 @@ require_relative 'lib/base'
 class Person < ReactiveRecord::Base
   validates :first_name, presence: true
   validates :last_name, presence: { message: 'Yes, last name is usally the same as House name, but it still must exist!' }
-  validates :age, presence: true, numericality: { greater_than: 1 }
+  validates :age, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than: 100 }
 
   belongs_to :house
   has_one_through :region, :house, :region

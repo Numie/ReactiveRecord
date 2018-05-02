@@ -55,6 +55,8 @@ module Validatable
   def numericality(val, column, options)
     message = "#{column} must be a number"
     if options.is_a?(Hash)
+      return if options[:allow_nil]
+
       default_message = options[:message]
       message = default_message || message
 
@@ -69,8 +71,48 @@ module Validatable
 
   private
 
+  def only_integer(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be an integer"
+    @errors << message unless input_val.is_a?(Integer)
+  end
+
   def greater_than(input_val, target_val, column, default_message)
     message = default_message || "#{column} must be greater than #{target_val}"
     @errors << message unless input_val > target_val
+  end
+
+  def greater_than_or_equal_to(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be greater than or equal to #{target_val}"
+    @errors << message unless input_val >= target_val
+  end
+
+  def equal_to(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be equal to #{target_val}"
+    @errors << message unless input_val == target_val
+  end
+
+  def less_than(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be less than #{target_val}"
+    @errors << message unless input_val < target_val
+  end
+
+  def less_than_or_equal_to(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be less than or equal to #{target_val}"
+    @errors << message unless input_val <= target_val
+  end
+
+  def other_than(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be other than #{target_val}"
+    @errors << message unless input_val != target_val
+  end
+
+  def odd(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be odd"
+    @errors << message unless input_val.is_a?(Integer) && input_val.odd?
+  end
+
+  def even(input_val, target_val, column, default_message)
+    message = default_message || "#{column} must be even"
+    @errors << message unless input_val.is_a?(Integer) && input_val.even?
   end
 end
