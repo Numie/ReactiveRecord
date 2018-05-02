@@ -53,6 +53,15 @@ module Validatable
     @errors << message if val.blank?
   end
 
+  def uniqueness(val, column, options)
+    message = "#{column} has already been taken"
+    if options.is_a?(Hash)
+      message = options[:message] || message
+    end
+
+    @errors << message if self.class.exists?({ column => val })
+  end
+
   def numericality(val, column, options)
     message = "#{column} must be a number"
     if options.is_a?(Hash)
@@ -66,17 +75,20 @@ module Validatable
         return
       end
 
-      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) }
+      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message }
     end
   end
 
-  def uniqueness(val, column, options)
-    message = "#{column} has already been taken"
+  def format(val, column, options)
+    message = "#{column} is invalid"
     if options.is_a?(Hash)
-      message = options[:message] || message
-    end
+      return if options[:allow_nil]
 
-    @errors << message if self.class.exists?({ column => val })
+      default_message = options[:message]
+      message = default_message || message
+
+      options.each { |validation, regex| self.send(validation, val, regex, message) unless validation == :message }
+    end
   end
 
   private
@@ -124,5 +136,13 @@ module Validatable
   def even(input_val, target_val, column, default_message)
     message = default_message || "#{column} must be even"
     @errors << message unless input_val.is_a?(Integer) && input_val.even?
+  end
+
+  def with(input_val, regex, message)
+    @errors << message unless regex.match?(input_val)
+  end
+
+  def without(input_val, regex, message)
+    @errors << message if regex.match?(input_val)
   end
 end

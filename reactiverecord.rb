@@ -24,6 +24,9 @@ class Pet < ReactiveRecord::Base
 end
 
 class House < ReactiveRecord::Base
+  validates :name, presence: true
+  validates :seat, presence: true
+
   belongs_to :region
   has_many :people, class_name: 'Person'
   has_many_through :pets, :people, :pets
