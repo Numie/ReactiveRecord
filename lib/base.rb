@@ -1,9 +1,10 @@
 require_relative 'db_connection'
+require_relative 'relation'
 require_relative 'searchable'
 require_relative 'calculatable'
 require_relative 'associatable'
-require_relative 'relation'
 require_relative 'validatable'
+require_relative 'callable'
 require_relative 'errors'
 require 'active_support/inflector'
 
@@ -13,6 +14,7 @@ module ReactiveRecord
     extend Calculatable
     extend Associatable
     include Validatable
+    include Callable
 
     def self.columns
       return @columns if @columns
@@ -337,5 +339,9 @@ WHERE id = ?
 
     attr_reader :association_cache
     attr_accessor :is_readonly
+
+    def self.lifecycle_callbacks
+      @lifecycle_callbacks
+    end
   end
 end

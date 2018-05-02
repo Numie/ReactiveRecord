@@ -9,7 +9,15 @@ class Person < ReactiveRecord::Base
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
+  before_validation :age_plus_one
+
   finalize!
+
+  private
+
+  def age_plus_one
+    self.age += 1
+  end
 end
 
 class Pet < ReactiveRecord::Base

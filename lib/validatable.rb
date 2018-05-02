@@ -1,8 +1,8 @@
 require_relative 'base'
+require_relative 'callable'
 require_relative 'errors'
 require 'active_support'
 require 'active_support/core_ext'
-require 'byebug'
 
 module Validatable
   def self.included(klass)
@@ -31,6 +31,8 @@ module Validatable
   end
 
   def perform_validations
+    self.perform_callbacks(:before_validation)
+    
     @errors = []
 
     self.class.validations.each do |column, validations|
