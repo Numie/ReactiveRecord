@@ -25,24 +25,30 @@ module Validatable
     end
   end
 
+  def errors
+    @errors ||= []
+  end
+
   def perform_validations
+    @errors = []
+
     self.class.validations.each do |column, validations|
       validations.each do |validation, options|
         val = self.send(column)
-        self.send(validation, val)
+        self.send(validation, val, column)
       end
     end
-  end
 
-  def presence(val)
-    puts 'validated presence' unless val.blank?
-  end
-
-  def numericality(val)
-    if val.is_a?(Integer)
-      puts 'validated numericality'
-    else
-      puts 'no validation'
+    unless @errors.empty?
+      raise ReactiveRecord::RecordInvalid.new("Validation failed: #{@errors.join(', ')}")
     end
+  end
+
+  def presence(val, column)
+    @errors << "#{column} must exist" if val.blank?
+  end
+
+  def numericality(val, column)
+    @errors << "#{column} must be an integer" unless val.is_a?(Integer)
   end
 end

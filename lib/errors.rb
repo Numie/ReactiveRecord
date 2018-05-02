@@ -7,6 +7,9 @@ module ReactiveRecord
 
   class ReadOnlyRecord < StandardError
   end
+
+  class RecordInvalid < StandardError
+  end
 end
 
 module ReactiveModel

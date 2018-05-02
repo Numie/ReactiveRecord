@@ -34,7 +34,7 @@ FROM #{self.table_name}
         #define getter
         define_method(col) do
           val = self.attributes[col]
-          raise ReactiveModel::MissingAttribute.new("Missing attribute: #{col}") unless val
+          # raise ReactiveModel::MissingAttribute.new("Missing attribute: #{col}") unless val
           val
         end
 
@@ -195,6 +195,7 @@ WHERE #{col} = ?
 
     def self.create(params)
       object = self.new(params)
+      object.perform_validations
       object.insert
     end
 
@@ -235,6 +236,9 @@ WHERE #{col} = ?
 
     def insert
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+
+      self.perform_validations
+
       #return all columns except id
       col_names = self.class.columns[1..-1].join(", ")
 
@@ -251,6 +255,9 @@ VALUES (#{question_marks})
 
     def update
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+
+      self.perform_validations
+
       set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
 
       DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
@@ -262,6 +269,7 @@ WHERE id = ?
 
     def save
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+      self.perform_validations
       self.id ? self.update : self.insert
     end
 
