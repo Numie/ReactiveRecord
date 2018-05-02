@@ -14,7 +14,7 @@ end
 
 class Pet < ReactiveRecord::Base
   validates :name, presence: true, uniqueness: true
-  validates :species, presence: true
+  validates :species, presence: true, inclusion: { in: ['Dire Wolf', 'Dragon'] }
 
   belongs_to :owner, class_name: 'Person'
   has_one_through :house, :owner, :house
@@ -24,8 +24,8 @@ class Pet < ReactiveRecord::Base
 end
 
 class House < ReactiveRecord::Base
-  validates :name, presence: true
-  validates :seat, presence: true
+  validates :name, :seat, :sigil, presence: true, uniqueness: true
+  validates :words, uniqueness: { allow_nil: true }
 
   belongs_to :region
   has_many :people, class_name: 'Person'
@@ -35,6 +35,8 @@ class House < ReactiveRecord::Base
 end
 
 class Region < ReactiveRecord::Base
+  validates :name, presence: true, uniqueness: true
+
   has_many :houses
   has_many_through :people, :houses, :people
   has_many_through :pets, :people, :pets

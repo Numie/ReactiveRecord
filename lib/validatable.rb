@@ -56,6 +56,7 @@ module Validatable
   def uniqueness(val, column, options)
     message = "#{column} has already been taken"
     if options.is_a?(Hash)
+      return if options[:allow_nil]
       message = options[:message] || message
     end
 
@@ -88,6 +89,18 @@ module Validatable
       message = default_message || message
 
       options.each { |validation, regex| self.send(validation, val, regex, message) unless validation == :message }
+    end
+  end
+
+  def inclusion(val, column, options)
+    message = "#{column} is invalid"
+    if options.is_a?(Hash)
+      return if options[:allow_nil]
+
+      default_message = options[:message]
+      message = default_message || message
+
+      options.each { |validation, array| self.send(validation, val, array, message) unless validation == :message }
     end
   end
 
@@ -144,5 +157,9 @@ module Validatable
 
   def without(input_val, regex, message)
     @errors << message if regex.match?(input_val)
+  end
+
+  def in(input_val, array, message)
+    @errors << message unless array.include?(input_val)
   end
 end
