@@ -391,7 +391,8 @@ WHERE #{where_col} IN (#{included_where_string})
 
       self.select_line ? self.select_line += ", COUNT(#{val})" : self.select_line = "COUNT(#{val})"
       self.calc = true
-      self
+      hashes = self.execute
+      hashes.first["COUNT(#{val})"]
     end
 
     def average(col)
@@ -406,7 +407,8 @@ WHERE #{where_col} IN (#{included_where_string})
 
       self.select_line ? self.select_line += ", AVG(#{val})" : self.select_line = "AVG(#{val})"
       self.calc = true
-      self
+      hashes = self.execute
+      hashes.first["AVG(#{val})"]
     end
 
     def minimum(col)
@@ -421,7 +423,8 @@ WHERE #{where_col} IN (#{included_where_string})
 
       self.select_line ? self.select_line += ", MIN(#{val})" : self.select_line = "MIN(#{val})"
       self.calc = true
-      self
+      hashes = self.execute
+      hashes.first["MIN(#{val})"]
     end
 
     def maximum(col)
@@ -436,7 +439,8 @@ WHERE #{where_col} IN (#{included_where_string})
 
       self.select_line ? self.select_line += ", MAX(#{val})" : self.select_line = "MAX(#{val})"
       self.calc = true
-      self
+      hashes = self.execute
+      hashes.first["MAX(#{val})"]
     end
 
     def sum(col)
@@ -451,7 +455,8 @@ WHERE #{where_col} IN (#{included_where_string})
 
       self.select_line ? self.select_line += ", SUM(#{val})" : self.select_line = "SUM(#{val})"
       self.calc = true
-      self
+      hashes = self.execute
+      hashes.first["SUM(#{val})"]
     end
 
     def readonly

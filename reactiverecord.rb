@@ -4,12 +4,14 @@ class Person < ReactiveRecord::Base
   validates :first_name, presence: true
   validates :last_name, presence: { message: 'Yes, last name is usally the same as House name, but it still must exist!' }
   validates :age, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than: 100 }
+  validates :sex, presence: true, inclusion: { in: ['M', 'F'] }
 
   belongs_to :house
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
-  before_validation :age_plus_one, :nth_of_his_name
+  after_initialize :nth_of_his_name
+  before_validation :age_plus_one
 
   finalize!
 
@@ -20,9 +22,12 @@ class Person < ReactiveRecord::Base
   end
 
   def nth_of_his_name
-    if Person.exists?(first_name: self.first_name, last_name: self.last_name)
-      self.first_name += ' II'
-    end
+    suffixes = {1 => 'st', 2 => 'nd', 3 => 'rd'}
+    name_count = Person.where(first_name: self.first_name, last_name: self.last_name).count
+    n = name_count + 1
+    suffix = suffixes[n] || 'th'
+    pronoun = self.sex == 'M' ? 'his' : 'her'
+    self.last_name += ", #{n}#{suffix} of #{pronoun} name"
   end
 end
 

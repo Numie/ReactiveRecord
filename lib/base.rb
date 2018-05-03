@@ -230,6 +230,7 @@ WHERE #{col} = ?
         end
       end
 
+      self.perform_callbacks(:after_initialize)
     end
 
     def attributes

@@ -15,9 +15,9 @@ module Callable
     # end
 
     def method_missing(method, *args)
-      available_callbacks = [:before_validation, :after_validation, :before_save, :around_save,
-        :after_save, :before_create, :around_create, :after_create, :before_update, :around_update,
-        :after_update, :before_destroy, :around_destroy, :after_destroy, :after_commit_or_rollback]
+      available_callbacks = [:before_validation, :after_validation, :before_save, :after_save,
+        :before_create, :after_create, :before_update, :after_update, :before_destroy, :after_destroy,
+        :after_initialize, :after_commit_or_rollback]
 
       if available_callbacks.include?(method)
         @lifecycle_callbacks ||= Hash.new { |h, k| h[k] = [] }
