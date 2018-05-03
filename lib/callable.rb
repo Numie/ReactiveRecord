@@ -6,13 +6,27 @@ module Callable
   end
 
   module ClassCallable
-    def before_validation(*methods, &prc)
-      @lifecycle_callbacks ||= Hash.new
-      @lifecycle_callbacks[:before_validation] ||= []
-      methods.each do |method|
-        @lifecycle_callbacks[:before_validation] << method
+    # def before_validation(*methods)
+    #   @lifecycle_callbacks ||= Hash.new
+    #   @lifecycle_callbacks[:before_validation] ||= []
+    #   methods.each do |method|
+    #     @lifecycle_callbacks[:before_validation] << method
+    #   end
+    # end
+
+    def method_missing(method, *args)
+      available_callbacks = [:before_validation, :after_validation, :before_save, :around_save,
+        :after_save, :before_create, :around_create, :after_create, :before_update, :around_update,
+        :after_update, :before_destroy, :around_destroy, :after_destroy, :after_commit_or_rollback]
+
+      if available_callbacks.include?(method)
+        @lifecycle_callbacks ||= Hash.new { |h, k| h[k] = [] }
+        args.each do |arg|
+          @lifecycle_callbacks[method] << arg
+        end
+      else
+        super
       end
-      @lifecycle_callbacks[:before_validation] << prc if prc
     end
   end
 

@@ -9,7 +9,7 @@ class Person < ReactiveRecord::Base
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
-  before_validation :age_plus_one
+  before_validation :age_plus_one, :nth_of_his_name
 
   finalize!
 
@@ -17,6 +17,12 @@ class Person < ReactiveRecord::Base
 
   def age_plus_one
     self.age += 1
+  end
+
+  def nth_of_his_name
+    if Person.exists?(first_name: self.first_name, last_name: self.last_name)
+      self.first_name += ' II'
+    end
   end
 end
 

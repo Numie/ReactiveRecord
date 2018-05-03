@@ -196,14 +196,18 @@ WHERE #{col} = ?
     end
 
     def self.create(params)
+      self.perform_callbacks(:before_create)
       object = self.new(params)
       object.insert
+      self.perform_callbacks(:after_create)
     end
 
     def self.create!(params)
+      self.perform_callbacks(:before_create)
       object = self.new(params)
       object.perform_validations
       object.insert!
+      self.perform_callbacks(:after_create)
     end
 
     def initialize(params = {})
@@ -292,6 +296,8 @@ VALUES (#{question_marks})
         return false
       end
 
+      self.perform_callbacks(:before_update)
+
       set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
 
       DBConnection.execute(<<-SQL, *attribute_values.rotate(1))
@@ -299,12 +305,15 @@ UPDATE #{self.class.table_name}
 SET #{set_line}
 WHERE id = ?
       SQL
+
+      self.perform_callbacks(:after_update)
     end
 
     def update!
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
 
       self.perform_validations
+      self.perform_callbacks(:before_update)
 
       set_line = self.class.columns[1..-1].map { |col| "#{col} = ?"}.join(", ")
 
@@ -313,26 +322,37 @@ UPDATE #{self.class.table_name}
 SET #{set_line}
 WHERE id = ?
       SQL
+
+      self.perform_callbacks(:after_update)
     end
 
     def save
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+      self.perform_callbacks(:before_save)
       self.id ? self.update : self.insert
+      self.perform_callbacks(:after_save)
     end
 
     def save!
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+      self.perform_callbacks(:before_save)
       self.id ? self.update! : self.insert!
+      self.perform_callbacks(:after_save)
     end
 
     def destroy
       raise ReactiveRecord::ReadOnlyRecord.new("#{self.class} is marked as readonly") if self.send(:is_readonly)
+
+      self.perform_callbacks(:before_destroy)
+
       id = self.id
 
       DBConnection.execute(<<-SQL, id)
 DELETE FROM #{self.class.table_name}
 WHERE id = ?
       SQL
+
+      self.perform_callbacks(:after_destroy)
     end
 
     private

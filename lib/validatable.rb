@@ -32,7 +32,7 @@ module Validatable
 
   def perform_validations
     self.perform_callbacks(:before_validation)
-    
+
     @errors = []
 
     self.class.validations.each do |column, validations|
@@ -45,6 +45,8 @@ module Validatable
     unless @errors.empty?
       raise ReactiveRecord::RecordInvalid.new("Validation failed: #{@errors.join(', ')}")
     end
+
+    self.perform_callbacks(:after_validation)
   end
 
   def presence(val, column, options)
