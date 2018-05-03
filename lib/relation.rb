@@ -67,6 +67,8 @@ module ReactiveRecord
         if self.is_readonly
           objects.each { |obj| obj.readonly }
         end
+
+        objects
       end
     end
 
