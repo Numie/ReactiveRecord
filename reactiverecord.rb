@@ -10,8 +10,8 @@ class Person < ReactiveRecord::Base
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
+  before_create :age_plus_one
   after_initialize :nth_of_his_name
-  before_validation :age_plus_one
 
   finalize!
 
@@ -22,6 +22,7 @@ class Person < ReactiveRecord::Base
   end
 
   def nth_of_his_name
+    return unless self.first_name && self.last_name
     suffixes = {1 => 'st', 2 => 'nd', 3 => 'rd'}
     name_count = Person.where(first_name: self.first_name, last_name: self.last_name).count
     n = name_count + 1

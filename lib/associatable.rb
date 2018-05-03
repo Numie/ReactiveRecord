@@ -16,6 +16,9 @@ module Associatable
     #create instance of BelongsToOptions, setting defaults if necessary
     self.assoc_options[name] = BelongsToOptions.new(name, options)
 
+    foreign_key_field = self.assoc_options[name].foreign_key
+    self.validations[foreign_key_field] = { presence: true }
+
     #create the association method
     define_method(name) do
       #fetch data from association_cache if it includes was called
