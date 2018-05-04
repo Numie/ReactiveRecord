@@ -2,7 +2,7 @@ require_relative 'lib/base'
 
 class Person < ReactiveRecord::Base
   validates :first_name, presence: true
-  validates :last_name, presence: { message: 'Yes, last name is usally the same as House name, but it still must exist!' }
+  validates :last_name, presence: { message: 'Yes, last name is usually the same as House name, but it still must exist!' }
   validates :age, presence: true, numericality: { only_integer: true, less_than: 100 }
   validates :sex, presence: true, inclusion: { in: ['M', 'F'] }
 
@@ -34,7 +34,7 @@ class Person < ReactiveRecord::Base
 end
 
 class Pet < ReactiveRecord::Base
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true, format: { without: /\d+/ }
   validates :species, presence: true, inclusion: { in: ['Dire Wolf', 'Dragon'] }
 
   belongs_to :owner, class_name: 'Person'
@@ -46,7 +46,7 @@ end
 
 class House < ReactiveRecord::Base
   validates :name, :seat, :sigil, presence: true, uniqueness: true
-  validates :words, uniqueness: { allow_nil: true }, length: { minimum: 2 }
+  validates :words, length: { minimum: 6, allow_nil: true }
 
   belongs_to :region
   has_many :people, class_name: 'Person'

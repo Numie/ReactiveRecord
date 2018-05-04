@@ -3,6 +3,7 @@ require_relative 'callable'
 require_relative 'errors'
 require 'active_support'
 require 'active_support/core_ext'
+require 'byebug'
 
 module Validatable
   def self.included(klass)
@@ -60,7 +61,7 @@ module Validatable
   def uniqueness(val, column, options)
     message = "#{column} has already been taken"
     if options.is_a?(Hash)
-      return if options[:allow_nil]
+      return if options[:allow_nil] && val.nil?
       message = options[:message] || message
     end
 
@@ -70,7 +71,7 @@ module Validatable
   def numericality(val, column, options)
     message = "#{column} must be a number"
     if options.is_a?(Hash)
-      return if options[:allow_nil]
+      return if options[:allow_nil] && val.nil?
 
       default_message = options[:message]
       message = default_message || message
@@ -80,39 +81,39 @@ module Validatable
         return
       end
 
-      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message }
+      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message || validation == :allow_nil }
     end
   end
 
   def format(val, column, options)
     message = "#{column} is invalid"
     if options.is_a?(Hash)
-      return if options[:allow_nil]
+      return if options[:allow_nil] && val.nil?
 
       default_message = options[:message]
       message = default_message || message
 
-      options.each { |validation, regex| self.send(validation, val, regex, message) unless validation == :message }
+      options.each { |validation, regex| self.send(validation, val, regex, message) unless validation == :message || validation == :allow_nil }
     end
   end
 
   def inclusion(val, column, options)
     message = "#{column} is invalid"
     if options.is_a?(Hash)
-      return if options[:allow_nil]
+      return if options[:allow_nil] && val.nil?
 
       default_message = options[:message]
       message = default_message || message
 
-      options.each { |validation, array| self.send(validation, val, array, message) unless validation == :message }
+      options.each { |validation, array| self.send(validation, val, array, message) unless validation == :message || validation == :allow_nil }
     end
   end
 
   def length(val, column, options)
     if options.is_a?(Hash)
-      return if options[:allow_nil]
+      return if options[:allow_nil] && val.nil?
       default_message = options[:message]
-      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message }
+      options.each { |validation, target_value| self.send(validation, val, target_value, column, default_message) unless validation == :message || validation == :allow_nil }
     end
   end
 

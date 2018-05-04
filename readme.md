@@ -662,6 +662,83 @@ ReactiveRecord offers many pre-defined validation helpers that you can use direc
 
 Each helper accepts an arbitrary number of attribute names, so with a single line of code you can add the same kind of validation to several attributes.
 
-All of them accept the :message option, which defines what message should be added to the `errors` collection if it fails. There is a default error message for each one of the validation helpers. These messages are used when the :message option isn't specified.
+All of them accept the `:message` option, which defines what message should be added to the `errors` collection if it fails. There is a default error message for each one of the validation helpers. These messages are used when the :message option isn't specified.
 
-### presence
+### Presence
+
+This helper validates that the specified attributes are not empty. It uses the `blank?` method to check if the value is either nil or a blank string.
+```
+class Person < ReactiveRecord::Base
+  validates :first_name, presence: true
+  validates :last_name, presence: { message: 'Yes, last name is usually the same as House name, but it still must exist!' }
+end
+```
+In the example above, `first_name` and `last_name` are validated for presence, the latter of which with a custom error message.
+
+Foreign keys of `belongs_to` associations are automatically validated for presence. There is no need validate foreign keys manually.
+```
+brienne = Person.new(first_name: 'Brienne', last_name: 'Tarth', age: 19, sex: 'F')
+brienne.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: house_id must exist
+```
+
+### Uniqueness
+
+This helper validates that the attribute's value is unique. The validation happens by performing an SQL query into the model's table, searching for an existing record with the same value in that attribute.
+```
+class House < ReactiveRecord::Base
+  validates :name, :seat, :sigil, presence: true, uniqueness: true
+end
+
+impostor_stark = House.new(name: 'Impostor Stark', seat: 'Winterfell', sigil: 'Impostor', region_id: 1)
+impostor_stark.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: seat has already been taken
+```
+
+### Format
+
+This helper validates the attributes' values by testing whether they match a given regular expression, which is specified using the `:with` or `:without` options.
+```
+class Pet < ReactiveRecord::Base
+  validates :name, presence: true, uniqueness: true, format: { without: /\d+/ }
+end
+
+clone = Pet.new(name: 'Shaggydog2', species: 'Dire Wolf', owner_id: 7)
+clone.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: name is invalid
+```
+The operation fails in the above example because Pet names cannot include numbers.
+
+### Inclusion
+
+This helper validates that the attributes' values are included in a given set. The inclusion helper has an option `:in` that receives the set of values that will be accepted.
+```
+class Pet < ReactiveRecord::Base
+  validates :species, presence: true, inclusion: { in: ['Dire Wolf', 'Dragon'] }
+end
+
+hedwig = Pet.new(name: 'Hedwig', species: 'Owl', owner_id: 12)
+hedwig.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: species is invalid
+```
+
+### Length
+
+This helper validates the length of the attributes' values. It provides a variety of options, so you can specify length constraints in different ways.
+
+The possible length constraint options are:
+
+* `:minimum` - The attribute cannot have less than the specified length.
+* `:maximum` - The attribute cannot have more than the specified length.
+* `:in` - The attribute length must be included in a given interval.
+* `:is` - The attribute length must be equal to the given value.
+
+```
+class House < ReactiveRecord::Base
+  validates :words, length: { minimum: 6, allow_nil: true }
+end
+
+house_hodor = House.new(name: 'Hodor', seat: 'Hodor', sigil: 'Hodor', words: 'Hodor', region_id: 1)
+house_hodor.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: words length must be at least 6
+```
