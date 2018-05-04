@@ -3,15 +3,15 @@ require_relative 'lib/base'
 class Person < ReactiveRecord::Base
   validates :first_name, presence: true
   validates :last_name, presence: { message: 'Yes, last name is usally the same as House name, but it still must exist!' }
-  validates :age, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than: 100 }
+  validates :age, presence: true, numericality: { only_integer: true, less_than: 100 }
   validates :sex, presence: true, inclusion: { in: ['M', 'F'] }
 
   belongs_to :house
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
-  after_validation :age_plus_one
-  before_create :nth_of_his_name
+  after_create :age_plus_one
+  after_initialize :nth_of_his_name
 
   finalize!
 
@@ -23,7 +23,7 @@ class Person < ReactiveRecord::Base
 
   def nth_of_his_name
     return unless self.first_name && self.last_name
-    return if self.last_name[-4..-1] == 'name'
+    return if self.id
     suffixes = {1 => 'st', 2 => 'nd', 3 => 'rd'}
     name_count = Person.where('first_name = ? AND last_name LIKE ?', self.first_name, "#{self.last_name}%").count
     n = name_count + 1
