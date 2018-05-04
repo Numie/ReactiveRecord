@@ -371,9 +371,5 @@ WHERE id = ?
 
     attr_reader :association_cache
     attr_accessor :is_readonly
-
-    def self.lifecycle_callbacks
-      @lifecycle_callbacks
-    end
   end
 end

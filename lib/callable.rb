@@ -6,6 +6,10 @@ module Callable
   end
 
   module ClassCallable
+    def lifecycle_callbacks
+      @lifecycle_callbacks ||= {}
+    end
+
     def method_missing(method, *args)
       available_callbacks = [:before_validation, :after_validation, :before_save, :after_save,
         :before_create, :after_create, :before_update, :after_update, :before_destroy, :after_destroy,
@@ -24,7 +28,7 @@ module Callable
 
   def perform_callbacks(type)
     lifecycle_callbacks = self.class.send(:lifecycle_callbacks)
-    return if lifecycle_callbacks[type].nil?
+    return unless lifecycle_callbacks[type]
     lifecycle_callbacks[type].each do |method|
       self.send(method)
     end

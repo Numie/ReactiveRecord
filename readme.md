@@ -72,8 +72,8 @@ mother_of_dragons.class
 ```
 The query returns a ReactiveRecord::Relation and does not hit the database because the data is not yet needed.
 ```
-mother_of_dragons.execute
->> [{"first_name"=>"Daenerys", "last_name"=>"Targaryen", "pet_count"=>3}]
+mother_of_dragons.first
+>> {"first_name"=>"Daenerys", "last_name"=>"Targaryen", "pet_count"=>3}
 ```
 Now the query is executed.
 
@@ -87,7 +87,8 @@ Methods that find a single entity, such as `find` and `first`, return a single i
 ### ::all
 See a list of the regions of Westeros. Returns a ReactiveRecord::Relation.
 ```
-Region.all
+regions = Region.all
+regions.execute
 ```
 
 ### ::find(ids)
@@ -110,14 +111,15 @@ Region.find_by(name: 'The Reach')
 ### ::find_by!(params)
 Same as ::find_by but returns an error when no results are found:
 ```
-Region.find_by!(name: 'The West')
+Region.find_by!(name: 'The Dothraki Sea')
 >> ReactiveRecord::RecordNotFound: Couldn't find Region
 ```
 
 ### ::take(n)
-Return Grey Wind, Lady and Nymeria.
+Return Grey Wind, Lady and Nymeria. Returns a ReactiveRecord::Relation if n is greater than 1.
 ```
-Pet.take(3)
+three_pets = Pet.take(3)
+three_pets.execute
 ```
 
 ### ::first
@@ -134,7 +136,7 @@ House.last
 
 ## Selecting Specific Fields
 
-By default, `Model.find` selects all the fields from the result. To select only a subset of fields from the result set, you can specify the subset via the `select` method.
+By default, ReactiveRecord::Relations objects select all the fields from a table. To select only a subset of fields, you can specify the subset via the `select` method.
 
 ### ::select(column_names)
 Find the name and sigil of each House.
@@ -144,12 +146,6 @@ House.select(:name, :sigil)
 Also accepts a string:
 ```
 House.select('name, sigil')
-```
-Be careful: `select` allows you to initialize a model object with only the fields that you've selected. If you attempt to access a field that is not in the initialized record you'll receive a `ReactiveModel::MissingAttribute` error.
-```
-stark = House.select(:name).first
-stark.sigil
->> ReactiveModel::MissingAttribute: Missing attribute: sigil
 ```
 
 ### ::distinct
@@ -321,7 +317,7 @@ The above code returns an empty relation and fires no queries. If a null relatio
 
 ReactiveRecord provides the `readonly` method on an object to explicitly disallow modification of it. Any attempt to alter a readonly record will not succeed, raising an ReactiveRecord::ReadOnlyRecord error.
 ```
-eddard = Person.first
+eddard = Person.readonly.first
 eddard.first_name = 'Ned'
 eddard.save
 >> ReactiveRecord::ReadOnlyRecord: Person is marked as readonly
@@ -491,15 +487,15 @@ Person.average(:age)
 ```
 
 ### ::minimum
-Find the youngest person in Westeros, Rickon:
+Find the youngest person's age:
 ```
-Person.select('*').minimum(:age)
+Person.minimum(:age)
 ```
 
 ### ::maximum
-Find the oldest person in Westeros, Maester Aemon:
+Find the oldest person's age:
 ```
-Person.select('*').maximum(:age)
+Person.maximum(:age)
 ```
 
 ### ::sum
@@ -513,7 +509,7 @@ Person.where(first_name: ['Joffrey', 'Myrcella', 'Tommen']).sum(:age)
 ### #insert
 Insert Lancel Lannister.
 ```
-lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', age: 16, house_id: 10)
+lancel = Person.new(first_name: 'Lancel', last_name: 'Lannister', age: 16, sex: 'M', house_id: 10)
 lancel.insert
 
 Person.find_by(first_name: 'Lancel')
@@ -522,7 +518,7 @@ Person.find_by(first_name: 'Lancel')
 ### #create
 Initialize and insert a record into the database with a single method call:
 ```
-Person.create(first_name: 'Kevan', last_name: 'Lannister', age: 52, house_id: 10)
+Person.create(first_name: 'Kevan', last_name: 'Lannister', age: 52, sex: 'M', house_id: 10)
 
 Person.find_by(first_name: 'Kevan')
 ```

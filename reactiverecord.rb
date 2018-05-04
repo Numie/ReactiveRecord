@@ -10,8 +10,8 @@ class Person < ReactiveRecord::Base
   has_one_through :region, :house, :region
   has_many :pets, foreign_key: :owner_id
 
-  before_create :age_plus_one
-  after_initialize :nth_of_his_name
+  after_validation :age_plus_one
+  before_create :nth_of_his_name
 
   finalize!
 
