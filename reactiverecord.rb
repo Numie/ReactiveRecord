@@ -23,8 +23,9 @@ class Person < ReactiveRecord::Base
 
   def nth_of_his_name
     return unless self.first_name && self.last_name
+    return if self.last_name[-4..-1] == 'name'
     suffixes = {1 => 'st', 2 => 'nd', 3 => 'rd'}
-    name_count = Person.where(first_name: self.first_name, last_name: self.last_name).count
+    name_count = Person.where('first_name = ? AND last_name LIKE ?', self.first_name, "#{self.last_name}%").count
     n = name_count + 1
     suffix = suffixes[n] || 'th'
     pronoun = self.sex == 'M' ? 'his' : 'her'

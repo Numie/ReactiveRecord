@@ -196,18 +196,14 @@ WHERE #{col} = ?
     end
 
     def self.create(params)
-      self.perform_callbacks(:before_create)
       object = self.new(params)
       object.insert
-      self.perform_callbacks(:after_create)
     end
 
     def self.create!(params)
-      self.perform_callbacks(:before_create)
       object = self.new(params)
       object.perform_validations
       object.insert!
-      self.perform_callbacks(:after_create)
     end
 
     def initialize(params = {})
@@ -255,6 +251,8 @@ WHERE #{col} = ?
         return false
       end
 
+      self.perform_callbacks(:before_create)
+
       #return all columns except id
       col_names = self.class.columns[1..-1].join(", ")
 
@@ -267,6 +265,9 @@ VALUES (#{question_marks})
       SQL
 
       self.id = DBConnection.last_insert_row_id
+
+      self.perform_callbacks(:after_create)
+      self
     end
 
     def insert!
@@ -274,6 +275,8 @@ VALUES (#{question_marks})
 
       self.perform_validations
 
+      self.perform_callbacks(:before_create)
+
       #return all columns except id
       col_names = self.class.columns[1..-1].join(", ")
 
@@ -286,6 +289,9 @@ VALUES (#{question_marks})
       SQL
 
       self.id = DBConnection.last_insert_row_id
+
+      self.perform_callbacks(:after_create)
+      self
     end
 
     def update
@@ -308,6 +314,7 @@ WHERE id = ?
       SQL
 
       self.perform_callbacks(:after_update)
+      self
     end
 
     def update!
@@ -325,6 +332,7 @@ WHERE id = ?
       SQL
 
       self.perform_callbacks(:after_update)
+      self
     end
 
     def save
@@ -332,6 +340,7 @@ WHERE id = ?
       self.perform_callbacks(:before_save)
       self.id ? self.update : self.insert
       self.perform_callbacks(:after_save)
+      self
     end
 
     def save!
@@ -339,6 +348,7 @@ WHERE id = ?
       self.perform_callbacks(:before_save)
       self.id ? self.update! : self.insert!
       self.perform_callbacks(:after_save)
+      self
     end
 
     def destroy
@@ -354,6 +364,7 @@ WHERE id = ?
       SQL
 
       self.perform_callbacks(:after_destroy)
+      self
     end
 
     private
