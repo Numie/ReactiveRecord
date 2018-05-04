@@ -664,6 +664,8 @@ Each helper accepts an arbitrary number of attribute names, so with a single lin
 
 All of them accept the `:message` option, which defines what message should be added to the `errors` collection if it fails. There is a default error message for each one of the validation helpers. These messages are used when the :message option isn't specified.
 
+Additionally, all but `presence` accept the `:allow_nil` option. When set to `true`, it allows `nil` values to be accepted regardless of other conditions.
+
 ### Presence
 
 This helper validates that the specified attributes are not empty. It uses the `blank?` method to check if the value is either nil or a blank string.
@@ -741,4 +743,28 @@ end
 house_hodor = House.new(name: 'Hodor', seat: 'Hodor', sigil: 'Hodor', words: 'Hodor', region_id: 1)
 house_hodor.save!
 >> ReactiveRecord::RecordInvalid: Validation failed: words length must be at least 6
+```
+
+### Numericality
+
+This helper validates that your attributes have only numeric values. By default, it will match an optional sign followed by an integral or floating point number. To specify that only integral numbers are allowed set `:only_integer` to `true`.
+
+Besides `:only_integer`, this helper also accepts the following options:
+
+* `:greater_than` - Specifies the value must be greater than the supplied value.
+* `:greater_than_or_equal_to` - Specifies the value must be greater than or equal to the supplied value.
+* `:equal_to` - Specifies the value must be equal to the supplied value.
+* `:less_than` - Specifies the value must be less than the supplied value.
+* `:less_than_or_equal_to` - Specifies the value must be less than or equal to the supplied value.
+* `:other_than` - Specifies the value must be other than the supplied value.
+* `:odd` - Specifies the value must be an odd number if set to true.
+* `:even` - Specifies the value must be an even number if set to true.
+
+```
+class Person < ReactiveRecord::Base
+  validates :age, presence: true, numericality: { only_integer: true, less_than: 100 }
+
+  old_nan = Person.new(first_name: 'Old', last_name: 'Nan', age: 100, sex: 'F', house_id: 1)
+  old_nan.save!
+  >> ReactiveRecord::RecordInvalid: Validation failed: age must be less than 100
 ```
