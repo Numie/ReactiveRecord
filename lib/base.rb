@@ -195,14 +195,13 @@ WHERE #{col} = ?
       relation
     end
 
-    def self.create(params)
+    def self.create(params = {})
       object = self.new(params)
       object.insert
     end
 
-    def self.create!(params)
+    def self.create!(params = {})
       object = self.new(params)
-      object.perform_validations
       object.insert!
     end
 

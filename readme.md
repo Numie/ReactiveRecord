@@ -577,6 +577,13 @@ grey_wind = Pet.find(1)
 grey_wind.owner
 ```
 
+###Pet#house
+Find the house of Summer.
+```
+summer = Pet.find(4)
+summer.house
+```
+
 ### House#people
 Find all people in House Baratheon.
 ```
@@ -591,9 +598,70 @@ tully = House.find(5)
 tully.region
 ```
 
+### House#pets
+Find the pets of House Targaryen.
+```
+targaryen = House.find(13)
+targaryen.pets
+```
+
 ### Region#houses
 Find the houses in the North.
 ```
 north = Region.find(1)
 north.houses
 ```
+
+### Region#people
+Find the people of Dorne.
+```
+dorne = Region.find(9)
+dorne.people
+```
+
+## Validations
+
+Model-level validations are used to ensure that only valid data is saved into your database.
+
+Creating and saving a new record will send an `SQL INSERT` operation to the database. Updating an existing record will send an `SQL UPDATE` operation instead. Validations are typically run before these commands are sent to the database. If any validations fail, ReactiveRecord will not perform the `INSERT` or `UPDATE` operation. This avoids storing an invalid object in the database.
+
+### When Does Validation Happen?
+
+The following methods trigger validations, and will save the object to the database only if the object is valid:
+
+* `create`
+* `create!`
+* `insert`
+* `insert!`
+* `update`
+* `update!`
+* `save`
+* `save!`
+
+The bang versions (e.g. save!) raise an exception if the record is invalid. The non-bang versions don't: create, insert and update return false, and save just returns the object.
+
+### Errors
+
+To see all of the errors messages from attempting to save an object, use `errors`.
+
+This method is only useful after validations have been run, because it only inspects the errors collection and does not trigger validations itself.
+
+```
+p = Person.new
+p.errors.any?
+>> false
+
+p.save
+p.errors.any?
+>> true
+```
+
+## Validation Helpers
+
+ReactiveRecord offers many pre-defined validation helpers that you can use directly inside your class definitions. These helpers provide common validation rules. Every time a validation fails, an error message is added to the object's `errors` collection.
+
+Each helper accepts an arbitrary number of attribute names, so with a single line of code you can add the same kind of validation to several attributes.
+
+All of them accept the :message option, which defines what message should be added to the `errors` collection if it fails. There is a default error message for each one of the validation helpers. These messages are used when the :message option isn't specified.
+
+### presence
