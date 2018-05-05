@@ -763,8 +763,9 @@ Besides `:only_integer`, this helper also accepts the following options:
 ```
 class Person < ReactiveRecord::Base
   validates :age, presence: true, numericality: { only_integer: true, less_than: 100 }
+end
 
-  old_nan = Person.new(first_name: 'Old', last_name: 'Nan', age: 100, sex: 'F', house_id: 1)
-  old_nan.save!
-  >> ReactiveRecord::RecordInvalid: Validation failed: age must be less than 100
+old_nan = Person.new(first_name: 'Old', last_name: 'Nan', age: 100, sex: 'F', house_id: 1)
+old_nan.save!
+>> ReactiveRecord::RecordInvalid: Validation failed: age must be less than 100
 ```
