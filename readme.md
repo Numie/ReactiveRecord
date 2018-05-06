@@ -769,3 +769,43 @@ old_nan = Person.new(first_name: 'Old', last_name: 'Nan', age: 100, sex: 'F', ho
 old_nan.save!
 >> ReactiveRecord::RecordInvalid: Validation failed: age must be less than 100
 ```
+
+## Callbacks
+
+Callbacks are methods that get called at certain moments of an object's life cycle. With callbacks it is possible to write code that will run whenever an ReactiveRecord object is created, saved, updated, deleted, validated, or loaded from the database.
+
+### Callback Registration
+
+In order to use the available callbacks, you need to register them. You can implement the callbacks as ordinary methods and use a macro-style class method to register them as callbacks:
+```
+class Person < ReactiveRecord::Base
+  after_create :age_plus_one
+
+  private
+
+  def age_plus_one
+    self.age += 1
+  end
+end
+
+davos = Person.create(first_name: 'Davos', last_name: 'Seaworth', age: 45, sex: 'M', house_id: 12)
+davos.age
+>> 46
+```
+
+### Available Callbacks
+
+Here is a list of the available ReactiveRecord callbacks:
+
+* before_validation
+* after_validation
+* before_create
+* after_create
+* before_update
+* after_update
+* before_save
+* after_save
+* before_destroy
+* after_destroy
+* after_initialize
+* after_commit/after_rollback
