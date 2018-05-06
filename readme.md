@@ -227,6 +227,19 @@ FROM people
 WHERE first_name IN ('Robert', 'Stannis', 'Renly')
 ```
 
+*Like Conditions*
+
+To find records using the `LIKE` expression, pass a second hash  with a key of `:like` to the conditions hash:
+```
+Person.where(first_name: {like: 'Rob%'})
+```
+This produces:
+```
+SELECT *
+FROM people
+WHERE first_name LIKE 'Rob%')
+```
+
 **NOT Conditions**
 
 `NOT` SQL queries can be built by `where.not`:
