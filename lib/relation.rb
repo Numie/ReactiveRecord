@@ -229,6 +229,9 @@ WHERE #{where_col} IN (#{included_where_string})
             if val[:>] || val[:<] || val[:>=] || val[:<=]
               vals << val.values.first
               "#{param} #{val.keys.first.to_s} ?"
+            elsif val[:like]
+              vals << val.values.first
+              "#{param} LIKE ?"
             else
               raise ReactiveRecord::ArgumentError.new("You passed a key of #{val.keys.first}. Keys may only be comparison operators like :<")
             end
